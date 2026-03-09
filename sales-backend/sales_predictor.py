@@ -12,10 +12,16 @@ class SalesPredictor:
         # Initialize with dummy training if DB is empty
         self.train_model()
 
-    def load_data_from_db(self):
+    def load_data_from_db(self, user_id=None, company_id=None):
         db: Session = SessionLocal()
         try:
-            sales = db.query(Sale).order_by(Sale.date).all()
+            query = db.query(Sale)
+            if user_id:
+                query = query.filter(Sale.user_id == user_id)
+            if company_id:
+                query = query.filter(Sale.company_id == company_id)
+            
+            sales = query.order_by(Sale.date).all()
             if not sales:
                 return pd.DataFrame()
             
@@ -36,8 +42,9 @@ class SalesPredictor:
         finally:
             db.close()
 
-    def train_model(self):
-        self.df = self.load_data_from_db()
+    def train_model(self, user_id=None, company_id=None):
+        self.df = self.load_data_from_db(user_id=user_id, company_id=company_id)
+
         
         if self.df.empty or len(self.df) < 2:
             print("Not enough data to train model. Need at least 2 months of data.")
@@ -77,8 +84,8 @@ class SalesPredictor:
             
         return future_months
 
-    def get_full_forecast(self):
-        self.train_model() # Retrain with latest data
+    def get_full_forecast(self, user_id=None, company_id=None):
+        self.train_model(user_id=user_id, company_id=company_id) # Retrain with filtered data
         
         if not hasattr(self, 'model_trained') or not self.model_trained:
              return {
@@ -103,6 +110,11 @@ class SalesPredictor:
             'summary': {
                 'total_historical_revenue': float(self.df['amount'].sum()),
                 'average_monthly_sales': float(self.df['amount'].mean()),
-                'predicted_growth': 'Positive' if self.model.coef_[0] > 0 else 'Negative'
+                'predicted_growth': 'Positive' if (hasattr(self.model, 'coef_') and self.model.coef_[0] > 0) else 'Negative',
+                'forecast_1m': round(sum(f['predicted_amount'] for f in future[:1]), 2),
+                'forecast_3m': round(sum(f['predicted_amount'] for f in future[:3]), 2),
+                'forecast_6m': round(sum(f['predicted_amount'] for f in future[:6]), 2)
             }
         }
+
+

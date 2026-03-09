@@ -7,8 +7,10 @@ python-multipart
 sqlalchemy
 python-jose[cryptography]
 passlib[bcrypt]
-bcrypt==4.0.1
+bcrypt==3.2.2
 pydantic[email]
 python-dotenv
 psycopg2-binary
-google-generativeai
+google-genai
+requests
+httpx

@@ -252,9 +252,9 @@ const Home = () => {
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-blue-500/50">
                             {[
-                                { val: "500+", label: "Companies" },
-                                { val: "10k+", label: "Active Salesmen" },
-                                { val: "$50M+", label: "Sales Tracked" },
+                                { val: "50+", label: "Companies" },
+                                { val: "1k+", label: "Active Salesmen" },
+                                { val: "₹50k+", label: "Sales Tracked" },
                                 { val: "99.9%", label: "Uptime" }
                             ].map((stat, idx) => (
                                 <div key={idx} className="p-4">

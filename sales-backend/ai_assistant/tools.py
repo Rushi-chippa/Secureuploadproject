@@ -6,6 +6,7 @@ from sales.router import Sale
 from products.router import Product
 import pandas as pd
 from analytics import advanced 
+from sales_predictor import SalesPredictor
 
 def get_leaderboard_context(db: Session, company_id: int):
     """
@@ -99,3 +100,27 @@ def get_regional_sales_context(db: Session, company_id: int):
         context += f"- {region}: ₹{revenue:,.2f}\n"
     
     return context
+
+def get_prediction_context(company_id: int, user_id: int = None):
+    """
+    Fetches sales predictions and returns them as a string context.
+    """
+    try:
+        predictor = SalesPredictor()
+        forecast_data = predictor.get_full_forecast(company_id=company_id, user_id=user_id)
+        summary = forecast_data.get('summary', {})
+        
+        if 'message' in summary and "Not enough data" in summary['message']:
+            return "Future Sales Forecast: Not enough historical data yet to generate an AI prediction."
+
+        context = "Future Sales Forecast (AI Predictions):\n"
+        context += f"- Next 1 Month: ₹{summary.get('forecast_1m', 0):,.2f}\n"
+        context += f"- Next 3 Months: ₹{summary.get('forecast_3m', 0):,.2f}\n"
+        context += f"- Next 6 Months: ₹{summary.get('forecast_6m', 0):,.2f}\n"
+        context += f"- Predicted Trend: {summary.get('predicted_growth', 'Unknown')}\n"
+        
+        return context
+    except Exception as e:
+        print(f"Error generating AI prediction context: {e}")
+        return "Future Sales Forecast: Currently unavailable due to a technical error."
+

@@ -1,5 +1,5 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base
 # Import all models to ensure they are registered with SQLAlchemy Base
@@ -18,6 +18,7 @@ from dashboard import router as dashboard_router
 from categories import router as categories_router
 from customers import router as customers_router
 from ai_assistant import router as ai_assistant
+from auth import utils
 
 # Create Tables
 # This will create tables for all imported models (Auth, Salesmen, Products, Sales)
@@ -70,42 +71,27 @@ os.makedirs("static/logos", exist_ok=True)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# --- Prediction Logic ---
-class DummyPredictor:
-    def get_full_forecast(self):
-        return {
-            'history': [],
-            'forecast': [],
-            'summary': {'message': "Prediction unavailable (scikit-learn not installed or error initializing)"}
-        }
-
-try:
-    from sales_predictor import SalesPredictor
-    print("Initializing Sales Predictor...")
-    predictor = SalesPredictor()
-    print("Sales Predictor Initialized Successfully.")
-except ImportError as e:
-    print(f"WARNING: Could not import SalesPredictor ({e}). Using DummyPredictor.")
-    predictor = DummyPredictor()
-except Exception as e:
-    print(f"WARNING: Error initializing SalesPredictor ({e}). Using DummyPredictor.")
-    predictor = DummyPredictor()
-
 
 @app.get("/")
 def read_root():
+
     return {
         "message": "Sales Portal Backend is running with DB!", 
         "docs": "/docs"
     }
 
 @app.get("/api/predict-sales")
-def get_prediction():
+def get_prediction(
+    current_user: auth_models.User = Depends(utils.get_current_active_user)
+):
     """
-    Returns historical data and future predictions based on DB data.
+    Returns historical data and future predictions based on DB data for the user's company or individual user.
     """
     try:
-        return predictor.get_full_forecast()
+        from sales_predictor import SalesPredictor
+        predictor = SalesPredictor()
+        user_id = current_user.id if current_user.role == "salesman" else None
+        return predictor.get_full_forecast(company_id=current_user.company_id, user_id=user_id)
     except Exception as e:
         print(f"Error generating prediction: {e}")
         return {
@@ -113,6 +99,9 @@ def get_prediction():
             'forecast': [],
             'summary': {'message': f"Error generating prediction: {str(e)}"}
         }
+    
+
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)

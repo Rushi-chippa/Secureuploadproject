@@ -81,19 +81,18 @@ def get_salesman_dashboard_data(
     trend_data = [{"date": str(d[0]), "amount": d[1]} for d in daily_sales]
     
     # 7. Prediction
-    # We need to instantiate predictor and filter for this user
-    # Does SalesPredictor support filtering? Not yet. define basic prediction here or update it.
-    # Let's do a simple linear regression here if data points > 2, else return empty
-    
-    prediction_summary = {"message": "Not enough data"}
-    if len(trend_data) > 5:
-        # Simple Logic: Avg daily sales * 30
-        avg_daily = total_sales / (len(trend_data) or 1) # simple approx
-        predicted_next_month = avg_daily * 30
-        prediction_summary = {
-            "predicted_next_month": round(predicted_next_month, 2),
-            "trend": "Stable" # Placeholder
-        }
+    # Use the advanced SalesPredictor but filtered for this user
+    try:
+        predictor = SalesPredictor()
+        forecast_data = predictor.get_full_forecast(user_id=user_id)
+        prediction_summary = forecast_data.get('summary', {"message": "Not enough data"})
+        
+        # Dashboard expects predicted_next_month, but predictor returns forecast_1m
+        if 'forecast_1m' in prediction_summary:
+            prediction_summary['predicted_next_month'] = prediction_summary['forecast_1m']
+    except Exception as e:
+        print(f"Error in salesman prediction: {e}")
+        prediction_summary = {"message": "Error calculating prediction"}
 
     return {
         "kpi": {
@@ -103,6 +102,7 @@ def get_salesman_dashboard_data(
             "achieved_percent": round(achieved_percent, 1),
             "rank": rank
         },
+
         "charts": {
             "product_distribution": product_data,
             "region_distribution": region_data,

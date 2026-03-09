@@ -26,7 +26,7 @@ class SalesmanResponse(SalesmanBase):
     created_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- Router ---
 router = APIRouter(

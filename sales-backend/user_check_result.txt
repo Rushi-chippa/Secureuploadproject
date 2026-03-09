@@ -1,6 +1,0 @@
-USER_FOUND: YES
-ID: 1
-Email: rushichippa7350@gmail.com
-Role: manager
-CompanyID: 2
-HashStart: $2b$12$HcQ3VXxa...

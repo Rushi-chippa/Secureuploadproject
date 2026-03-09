@@ -209,7 +209,7 @@ const SalesmanRegister = () => {
                                 <div className="space-y-5 bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700">
                                     <div className="grid grid-cols-2 gap-5">
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 ml-1">Employee ID</label>
+                                            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5 ml-1">Employee ID</label>
                                             <input
                                                 type="text"
                                                 name="employee_id"
@@ -221,7 +221,7 @@ const SalesmanRegister = () => {
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 ml-1">Full Name</label>
+                                            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5 ml-1">Full Name</label>
                                             <input
                                                 type="text"
                                                 name="full_name"
@@ -235,7 +235,7 @@ const SalesmanRegister = () => {
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 ml-1">Email Address</label>
+                                        <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5 ml-1">Email Address</label>
                                         <input
                                             type="email"
                                             name="email"
@@ -249,7 +249,7 @@ const SalesmanRegister = () => {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 ml-1">Password</label>
+                                            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5 ml-1">Password</label>
                                             <div className="relative">
                                                 <input
                                                     type={showPassword ? "text" : "password"}
@@ -280,7 +280,7 @@ const SalesmanRegister = () => {
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 ml-1">Confirm</label>
+                                            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5 ml-1">Confirm</label>
                                             <div className="relative">
                                                 <input
                                                     type={showConfirmPassword ? "text" : "password"}

@@ -276,7 +276,13 @@ const Dashboard = () => {
                                     .sort(([, a], [, b]) => b - a)
                                     .slice(0, 5)
                                     .map(([, amount]) => amount),
-                                backgroundColor: 'rgba(249, 115, 22, 0.8)', // Orange
+                                backgroundColor: [
+                                    'rgba(59, 130, 246, 0.8)', // Blue
+                                    'rgba(16, 185, 129, 0.8)', // Green
+                                    'rgba(249, 115, 22, 0.8)', // Orange
+                                    'rgba(139, 92, 246, 0.8)', // Purple
+                                    'rgba(239, 68, 68, 0.8)',  // Red
+                                ],
                                 borderRadius: 4
                             }]
                         }}

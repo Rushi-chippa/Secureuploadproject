@@ -199,12 +199,12 @@ const Register = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-2">Company Size</label>
+                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Company Size</label>
                                     <select
                                         name="companySize"
                                         value={companyData.companySize}
                                         onChange={handleCompanyChange}
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none text-slate-900 bg-white"
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none text-slate-900 dark:text-white bg-white dark:bg-slate-900"
                                     >
                                         <option value="">Select Size</option>
                                         <option value="1-10">1-10 employees</option>
@@ -217,26 +217,26 @@ const Register = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">Phone Number</label>
+                                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Phone Number</label>
                                 <input
                                     type="tel"
                                     name="phone"
                                     value={companyData.phone}
                                     onChange={handleCompanyChange}
                                     placeholder="Enter phone number"
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none text-slate-900 placeholder:text-slate-400"
+                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-white dark:bg-slate-900"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">Address</label>
+                                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Address</label>
                                 <textarea
                                     name="address"
                                     value={companyData.address}
                                     onChange={handleCompanyChange}
                                     placeholder="Enter company address"
                                     rows="3"
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none text-slate-900 placeholder:text-slate-400 resize-none"
+                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-white dark:bg-slate-900 resize-none"
                                 ></textarea>
                             </div>
 
@@ -249,7 +249,7 @@ const Register = () => {
                     {step === 2 && (
                         <form onSubmit={handleAdminSubmit} className="space-y-6 animate-fadeIn">
                             <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">Full Name *</label>
+                                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Full Name *</label>
                                 <input
                                     type="text"
                                     name="name"
@@ -257,12 +257,12 @@ const Register = () => {
                                     onChange={handleAdminChange}
                                     placeholder="Enter your full name"
                                     required
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none text-slate-900 placeholder:text-slate-400"
+                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-white dark:bg-slate-900"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address *</label>
+                                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Email Address *</label>
                                 <input
                                     type="email"
                                     name="email"
@@ -270,13 +270,13 @@ const Register = () => {
                                     onChange={handleAdminChange}
                                     placeholder="Enter your email"
                                     required
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none text-slate-900 placeholder:text-slate-400"
+                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-white dark:bg-slate-900"
                                 />
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-2">Password *</label>
+                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Password *</label>
                                     <input
                                         type="password"
                                         name="password"
@@ -284,11 +284,11 @@ const Register = () => {
                                         onChange={handleAdminChange}
                                         placeholder="Create a password"
                                         required
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none text-slate-900 placeholder:text-slate-400"
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-white dark:bg-slate-900"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-2">Confirm Password *</label>
+                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Confirm Password *</label>
                                     <input
                                         type="password"
                                         name="confirmPassword"
@@ -296,7 +296,7 @@ const Register = () => {
                                         onChange={handleAdminChange}
                                         placeholder="Confirm your password"
                                         required
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none text-slate-900 placeholder:text-slate-400"
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-white dark:bg-slate-900"
                                     />
                                 </div>
                             </div>
@@ -314,7 +314,7 @@ const Register = () => {
                             <button
                                 type="button"
                                 onClick={() => setStep(1)}
-                                className="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition-all"
+                                className="w-full py-3 px-4 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold rounded-lg transition-all"
                             >
                                 ← Back
                             </button>
@@ -322,10 +322,10 @@ const Register = () => {
                     )}
                 </div>
 
-                <div className="bg-gray-50 p-6 text-center border-t border-gray-100">
-                    <p className="text-sm text-slate-600">
+                <div className="bg-gray-50 dark:bg-slate-800/50 p-6 text-center border-t border-gray-100 dark:border-slate-700">
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
                         Already have an account?
-                        <Link to="/login" className="font-semibold text-blue-600 hover:text-blue-700 hover:underline ml-1">Sign in</Link>
+                        <Link to="/login" className="font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline ml-1">Sign in</Link>
                     </p>
                 </div>
             </div>

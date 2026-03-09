@@ -6,7 +6,8 @@ import autoTable from 'jspdf-autotable';
 const Reports = () => {
     const { sales, fetchAllData } = useData();
     const [filterSalesman, setFilterSalesman] = useState('');
-    const [filterDate, setFilterDate] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
 
     useEffect(() => {
         fetchAllData();
@@ -15,10 +16,27 @@ const Reports = () => {
     const filteredSales = sales
         .filter(sale => {
             const matchSalesman = filterSalesman ? sale.salesman_name?.toLowerCase().includes(filterSalesman.toLowerCase()) : true;
-            const matchDate = filterDate ? sale.date.startsWith(filterDate) : true;
+
+            let matchDate = true;
+            if (startDate || endDate) {
+                const saleDate = new Date(sale.date);
+                saleDate.setHours(0, 0, 0, 0);
+
+                if (startDate) {
+                    const start = new Date(startDate);
+                    start.setHours(0, 0, 0, 0);
+                    if (saleDate < start) matchDate = false;
+                }
+                if (endDate) {
+                    const end = new Date(endDate);
+                    end.setHours(23, 59, 59, 999);
+                    if (saleDate > end) matchDate = false;
+                }
+            }
+
             return matchSalesman && matchDate;
         })
-        .sort((a, b) => new Date(a.date) - new Date(b.date));
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -120,7 +138,7 @@ const Reports = () => {
                 </div>
             </div>
 
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4">
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4 max-w-full overflow-x-auto">
                 <input
                     type="text"
                     placeholder="Filter by Salesman..."
@@ -128,12 +146,24 @@ const Reports = () => {
                     onChange={(e) => setFilterSalesman(e.target.value)}
                     className="border border-gray-200 rounded-lg px-4 py-2 w-full max-w-xs focus:ring-2 focus:ring-blue-500 outline-none"
                 />
-                <input
-                    type="date"
-                    value={filterDate}
-                    onChange={(e) => setFilterDate(e.target.value)}
-                    className="border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                />
+                <div className="flex items-center gap-2">
+                    <span className="text-sm text-slate-500 font-medium whitespace-nowrap">From:</span>
+                    <input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none min-w-[140px]"
+                    />
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="text-sm text-slate-500 font-medium whitespace-nowrap">To:</span>
+                    <input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none min-w-[140px]"
+                    />
+                </div>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">

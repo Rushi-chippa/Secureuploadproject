@@ -38,7 +38,7 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-200">
             {/* Background decorations */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/5 rounded-full blur-3xl"></div>
@@ -82,7 +82,7 @@ const Login = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">Password</label>
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Password</label>
                             <div className="relative">
                                 <input
                                     type={showPassword ? "text" : "password"}

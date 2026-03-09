@@ -157,7 +157,7 @@ const AddProduct = ({ onSubmit, onCancel, initialData, isEdit = false, categorie
                         onChange={handleChange}
                         placeholder="0"
                         min="0"
-                        className={`form-input ₹{errors.quantity ? 'input-error' : ''}`}
+                        className={`form-input ${errors.quantity ? 'input-error' : ''}`}
                     />
                     {errors.quantity && <span className="error-text">{errors.quantity}</span>}
                 </div>

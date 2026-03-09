@@ -23,18 +23,6 @@ Here are practical Data Analytics features you can implement using your existing
   - Identify products with zero sales in the last 30/60/90 days.
   - *Action*: Create discount campaigns to clear stock.
 
-## 3. Customer Insights (CRM Analytics)
-- **RFM Analysis (Recency, Frequency, Monetary)**:
-  - Segment customers into groups:
-    - **Champions**: Bought recently, buy often, and spend the most.
-    - **Loyal Customers**: Buy on a regular basis.
-    - **At Risk**: Spending big but haven't bought recently.
-  - *Action*: Tailor marketing/sales calls based on segment.
-- **Customer Lifetime Value (CLV)**:
-  - Estimate the total revenue a customer will generate over their relationship.
-  - *Action*: Focus retention efforts on high CLV customers.
-- **Churn Risk Indicators**:
-  - Flag customers whose purchase frequency has dropped significantly (e.g., used to buy weekly, now hasn't bought in 3 weeks).
 
 ## 4. Sales Force Effectiveness
 - **Consistency Score**:

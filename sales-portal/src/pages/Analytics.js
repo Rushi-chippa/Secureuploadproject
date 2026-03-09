@@ -42,9 +42,11 @@ const Analytics = () => {
 
     const [rfmData, setRfmData] = useState([]);
     const [abcData, setAbcData] = useState({});
+    const [forecastRange, setForecastRange] = useState(6); // Default to 6 months
 
     useEffect(() => {
         const fetchData = async () => {
+
             setLoading(true);
             try {
                 // Fetch basic report data
@@ -129,33 +131,52 @@ const Analytics = () => {
     let predictionChartData = null;
     if (predictionData && predictionData.history && predictionData.forecast) {
         const historyLabels = predictionData.history.map(d => new Date(d.date).toLocaleDateString('default', { month: 'short', year: '2-digit' }));
-        const forecastLabels = predictionData.forecast.map(d => new Date(d.date).toLocaleDateString('default', { month: 'short', year: '2-digit' }));
+        const filteredForecast = predictionData.forecast.slice(0, forecastRange);
+        const forecastLabels = filteredForecast.map(d => new Date(d.date).toLocaleDateString('default', { month: 'short', year: '2-digit' }));
+
+        const lastHistoryValue = predictionData.history[predictionData.history.length - 1]?.amount || 0;
+
+        const historyCount = predictionData.history.length;
+        const hasHistory = historyCount > 0;
 
         predictionChartData = {
             labels: [...historyLabels, ...forecastLabels],
             datasets: [
                 {
                     label: 'Historical Sales',
-                    data: [...predictionData.history.map(d => d.amount), ...new Array(predictionData.forecast.length).fill(null)],
+                    data: [...predictionData.history.map(d => d.amount), ...new Array(filteredForecast.length).fill(null)],
                     borderColor: '#4f46e5',
-                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                    tension: 0.3,
-                    fill: false,
-                    pointRadius: 4,
+                    backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                    tension: 0.4,
+                    fill: 'origin',
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: '#fff',
+                    pointBorderWidth: 2,
                 },
                 {
-                    label: 'Predicted Sales',
-                    data: [...new Array(predictionData.history.length).fill(null), ...predictionData.forecast.map(d => d.predicted_amount)],
+                    label: 'AI Predicted Forecast',
+                    data: [
+                        ...new Array(Math.max(0, hasHistory ? historyCount - 1 : 0)).fill(null),
+                        ...(hasHistory ? [lastHistoryValue] : []),
+                        ...filteredForecast.map(d => d.predicted_amount)
+                    ],
                     borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    borderDash: [5, 5],
-                    tension: 0.3,
-                    fill: false,
-                    pointRadius: 4,
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    borderDash: [6, 4],
+                    tension: 0.4,
+                    fill: 'origin',
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: '#fff',
+                    pointBorderWidth: 2,
                 }
             ]
         };
+
     }
+
+
 
     // RFM Chart Data
     const rfmSegments = rfmData.reduce((acc, curr) => {
@@ -324,13 +345,125 @@ const Analytics = () => {
                     </div>
                 </div>
 
-                <div className="h-80">
+                {/* Forecast Summary Blocks */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <button
+                        onClick={() => setForecastRange(1)}
+                        className={`text-left transition-all duration-300 transform hover:scale-[1.02] p-6 rounded-3xl border-2 shadow-sm flex flex-col justify-between h-48 ${forecastRange === 1
+                            ? 'bg-blue-600 border-blue-600 text-white shadow-blue-200'
+                            : 'bg-white border-blue-50 text-slate-800 hover:border-blue-200'
+                            }`}
+                    >
+                        <div className="flex justify-between items-start">
+                            <span className={`p-3 rounded-2xl text-2xl ${forecastRange === 1 ? 'bg-blue-500 text-white' : 'bg-blue-50 text-blue-600'
+                                }`}>📅</span>
+                            <span className={`text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full ${forecastRange === 1 ? 'bg-blue-500 text-white' : 'bg-blue-50 text-blue-500'
+                                }`}>Next Month</span>
+                        </div>
+                        <div>
+                            <p className={`text-sm font-medium mb-1 ${forecastRange === 1 ? 'text-blue-100' : 'text-slate-500'}`}>Predicted Revenue</p>
+                            <p className="text-3xl font-extrabold">₹{(predictionData?.summary?.forecast_1m || 0).toLocaleString()}</p>
+                        </div>
+                    </button>
+
+                    <button
+                        onClick={() => setForecastRange(3)}
+                        className={`text-left transition-all duration-300 transform hover:scale-[1.02] p-6 rounded-3xl border-2 shadow-sm flex flex-col justify-between h-48 ${forecastRange === 3
+                            ? 'bg-indigo-600 border-indigo-600 text-white shadow-indigo-200'
+                            : 'bg-white border-indigo-50 text-slate-800 hover:border-indigo-200'
+                            }`}
+                    >
+                        <div className="flex justify-between items-start">
+                            <span className={`p-3 rounded-2xl text-2xl ${forecastRange === 3 ? 'bg-indigo-500 text-white' : 'bg-indigo-50 text-indigo-600'
+                                }`}>📈</span>
+                            <span className={`text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full ${forecastRange === 3 ? 'bg-indigo-500 text-white' : 'bg-indigo-50 text-indigo-500'
+                                }`}>Next 3 Months</span>
+                        </div>
+                        <div>
+                            <p className={`text-sm font-medium mb-1 ${forecastRange === 3 ? 'text-indigo-100' : 'text-slate-500'}`}>Predicted Revenue</p>
+                            <p className="text-3xl font-extrabold">₹{(predictionData?.summary?.forecast_3m || 0).toLocaleString()}</p>
+                        </div>
+                    </button>
+
+                    <button
+                        onClick={() => setForecastRange(6)}
+                        className={`text-left transition-all duration-300 transform hover:scale-[1.02] p-6 rounded-3xl border-2 shadow-sm flex flex-col justify-between h-48 ${forecastRange === 6
+                            ? 'bg-emerald-600 border-emerald-600 text-white shadow-emerald-200'
+                            : 'bg-white border-emerald-50 text-slate-800 hover:border-emerald-200'
+                            }`}
+                    >
+                        <div className="flex justify-between items-start">
+                            <span className={`p-3 rounded-2xl text-2xl ${forecastRange === 6 ? 'bg-emerald-500 text-white' : 'bg-emerald-50 text-emerald-600'
+                                }`}>🚀</span>
+                            <span className={`text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full ${forecastRange === 6 ? 'bg-emerald-500 text-white' : 'bg-emerald-50 text-emerald-500'
+                                }`}>Next 6 Months</span>
+                        </div>
+                        <div>
+                            <p className={`text-sm font-medium mb-1 ${forecastRange === 6 ? 'text-emerald-100' : 'text-slate-500'}`}>Predicted Revenue</p>
+                            <p className="text-3xl font-extrabold">₹{(predictionData?.summary?.forecast_6m || 0).toLocaleString()}</p>
+                        </div>
+                    </button>
+                </div>
+
+
+
+                <div className="h-[28rem]">
                     {predictionChartData ? (
-                        <Line data={predictionChartData} options={{ responsive: true, maintainAspectRatio: false }} />
+                        <Line
+                            data={predictionChartData}
+                            options={{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                        labels: {
+                                            usePointStyle: true,
+                                            padding: 20,
+                                            font: { size: 12, weight: '600' }
+                                        }
+                                    },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                        titleColor: '#1e293b',
+                                        bodyColor: '#475569',
+                                        borderColor: '#e2e8f0',
+                                        borderWidth: 1,
+                                        padding: 12,
+                                        displayColors: true,
+                                        callbacks: {
+                                            label: function (context) {
+                                                let label = context.dataset.label || '';
+                                                if (label) { label += ': '; }
+                                                if (context.parsed.y !== null) {
+                                                    label += new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(context.parsed.y);
+                                                }
+                                                return label;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        grid: { color: 'rgba(0, 0, 0, 0.05)', drawBorder: false },
+                                        ticks: {
+                                            font: { size: 11 },
+                                            callback: (value) => '₹' + value.toLocaleString('en-IN')
+                                        }
+                                    },
+                                    x: {
+                                        grid: { display: false, drawBorder: false },
+                                        ticks: { font: { size: 11, weight: '500' } }
+                                    }
+                                }
+                            }}
+                        />
                     ) : (
                         <div className="h-full flex items-center justify-center text-slate-400">Not enough data for prediction</div>
                     )}
                 </div>
+
             </div>
 
             {/* Charts Section */}
