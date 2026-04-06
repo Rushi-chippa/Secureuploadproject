@@ -50,7 +50,7 @@ const Home = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
                         <div className="flex items-center gap-2">
-                            <span className="text-2xl">🏢</span>
+                            <span className="text-2xl"></span>
                             <span className="font-bold text-xl tracking-tight text-slate-900 dark:text-white">SalesPortal</span>
                         </div>
                         <nav className="flex items-center gap-4">
@@ -482,7 +482,7 @@ const Home = () => {
                     </div>
                 </div>
                 <div className="max-w-7xl mx-auto px-4 mt-12 pt-8 border-t border-slate-900 text-center text-sm">
-                    <p>© 2024 SalesPortal. All rights reserved.</p>
+                    <p>© 2026 SalesPortal. All rights reserved.</p>
                 </div>
             </footer>
         </div>

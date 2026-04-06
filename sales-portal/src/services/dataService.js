@@ -13,6 +13,7 @@ export const dataService = {
     updateSalesman: async (id, data) => api.put(`/api/salesmen/${id}`, data),
     deleteSalesman: async (id) => api.delete(`/api/salesmen/${id}`),
     getSalesmanDetails: async (id) => api.get(`/api/salesmen/${id}`),
+    setSalesmanTarget: async (id, month, target) => api.post(`/api/salesmen/${id}/target`, { month, target }),
 
     // Sales
     getSales: async (params) => api.get('/api/sales/', { params }),
@@ -21,10 +22,10 @@ export const dataService = {
     deleteSale: async (id) => api.delete(`/api/sales/${id}`),
 
     // Analytics & Reports
-    getPredictions: async () => api.get('/api/predict-sales'),
-    getDashboardStats: async () => api.get('/api/analytics/dashboard-stats'),
+    getPredictions: async (params) => api.get('/api/predict-sales', { params }),
+    getDashboardStats: async (params) => api.get('/api/analytics/dashboard-stats', { params }),
     getReportsData: async (params) => api.get('/api/analytics/reports', { params }),
-    getLeaderboard: async () => api.get('/api/analytics/leaderboard'),
+    getLeaderboard: async (params) => api.get('/api/analytics/leaderboard', { params }),
 
     // Advanced Analytics
     getExecutiveKPIs: async () => api.get('/api/analytics/kpi/executive'),

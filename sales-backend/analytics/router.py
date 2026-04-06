@@ -20,6 +20,7 @@ router.include_router(salesman_stats.router)
 
 @router.get("/dashboard-stats")
 def get_dashboard_stats(
+    month: str = None,
     db: Session = Depends(get_db), 
     current_user: auth_models.User = Depends(utils.get_current_active_user)
 ):
@@ -36,6 +37,18 @@ def get_dashboard_stats(
     # Filter for Salesman
     if current_user.role == "salesman":
         sales_query = sales_query.filter(Sale.user_id == current_user.id)
+
+    if month:
+        import datetime
+        from calendar import monthrange
+        try:
+            year, m = map(int, month.split('-'))
+            start_date = datetime.datetime(year, m, 1, 0, 0, 0)
+            end_date_day = monthrange(year, m)[1]
+            end_date = datetime.datetime(year, m, end_date_day, 23, 59, 59)
+            sales_query = sales_query.filter(Sale.date >= start_date, Sale.date <= end_date)
+        except Exception as e:
+            print(f"Invalid month format: {month}, error: {e}")
 
     # Execute Aggregations
     total_revenue = sales_query.with_entities(func.sum(Sale.amount)).scalar() or 0
@@ -68,9 +81,33 @@ def get_dashboard_stats(
             "date": sale.date
         })
 
+    # Total Company Target for the month
+    all_salesmen = db.query(auth_models.User).filter(
+        auth_models.User.company_id == current_user.company_id,
+        auth_models.User.role == "salesman"
+    ).all()
+    
+    total_company_target = 0
+    current_month_now = datetime.datetime.utcnow().strftime("%Y-%m")
+    target_month_now = month if month else current_month_now
+    
+    # Pre-fetch monthly targets for all salesmen
+    mts = db.query(auth_models.MonthlyTarget).filter(auth_models.MonthlyTarget.month == target_month_now).all()
+    target_map = {t.user_id: t.target_amount for t in mts}
+    
+    for sm in all_salesmen:
+        if sm.id in target_map:
+            total_company_target += target_map[sm.id]
+        elif target_month_now < current_month_now:
+            total_company_target += sm.sales_target or 0
+        else:
+            total_company_target += 0
+
     stats["total_revenue"] = total_revenue
     stats["total_orders"] = total_orders
     stats["avg_order_value"] = round(avg_order_value, 2)
+    stats["total_company_target"] = total_company_target
+    stats["achieved_percent"] = round((total_revenue / total_company_target * 100), 1) if total_company_target > 0 else 0
     stats["recent_sales"] = formatted_sales
 
     return stats
@@ -148,44 +185,58 @@ def get_reports_data(
 
 @router.get("/leaderboard")
 def get_leaderboard(
+    month: str = None,
     db: Session = Depends(get_db),
     current_user: auth_models.User = Depends(utils.get_current_active_user)
 ):
-    # 1. Fetch company salesmen sales aggregation
-    # Query: User ID, Total Revenue, Total Quantity
-    results = db.query(
-        Sale.user_id,
-        func.sum(Sale.amount).label("total_revenue"),
-        func.sum(Sale.quantity).label("total_quantity")
-    ).filter(
-        Sale.company_id == current_user.company_id
-    ).group_by(Sale.user_id).order_by(func.sum(Sale.amount).desc()).all()
-
-    leaderboard = []
-    rank = 1
+    import datetime
+    from calendar import monthrange
     
-    # We need to fetch user details for each result
-    # In a larger app, we'd join User in the initial query, but here let's iterate or join
-    # Let's try to join for efficiency
-    
-    # Enhanced Query with Join
-    results = db.query(
+    query = db.query(
         auth_models.User,
         func.sum(Sale.amount).label("total_revenue"),
         func.sum(Sale.quantity).label("total_quantity")
     ).join(Sale, Sale.user_id == auth_models.User.id).filter(
         Sale.company_id == current_user.company_id
-    ).group_by(auth_models.User.id).order_by(func.sum(Sale.amount).desc()).all()
+    )
+
+    if month:
+        try:
+            year, m = map(int, month.split('-'))
+            start_date = datetime.datetime(year, m, 1, 0, 0, 0)
+            end_date_day = monthrange(year, m)[1]
+            end_date = datetime.datetime(year, m, end_date_day, 23, 59, 59)
+            query = query.filter(Sale.date >= start_date, Sale.date <= end_date)
+        except Exception as e:
+            pass
+
+    results = query.group_by(auth_models.User.id).order_by(func.sum(Sale.amount).desc()).all()
+
+    leaderboard = []
+    rank = 1
+    
+    current_month_str = datetime.datetime.utcnow().strftime("%Y-%m")
+    target_month_str = month if month else current_month_str
+    mts = db.query(auth_models.MonthlyTarget).filter(auth_models.MonthlyTarget.month == target_month_str).all()
+    target_dict = {t.user_id: t.target_amount for t in mts}
 
     for user, revenue, quantity in results:
+        mt_target = target_dict.get(user.id)
+        if mt_target is not None:
+            user_target = mt_target
+        elif target_month_str < current_month_str:
+            user_target = user.sales_target or 0
+        else:
+            user_target = 0
+            
         leaderboard.append({
             "rank": rank,
             "name": user.full_name,
             "avatar": user.full_name[0] if user.full_name else "?",
             "revenue": revenue,
             "quantity": quantity,
-            "sales_target": user.sales_target or 0,
-            "achieved_percent": (revenue / user.sales_target * 100) if user.sales_target else 0
+            "sales_target": user_target,
+            "achieved_percent": (revenue / user_target * 100) if user_target > 0 else 0
         })
         rank += 1
             

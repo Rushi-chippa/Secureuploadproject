@@ -10,6 +10,32 @@ const SalesmanDashboard = () => {
     const [isLoadingStats, setIsLoadingStats] = useState(true);
     const [showModal, setShowModal] = useState(false);
 
+    const currentMonthStr = new Date().toISOString().slice(0, 7);
+    const [selectedMonth, setSelectedMonth] = useState(currentMonthStr);
+
+    const monthOptions = React.useMemo(() => {
+        const options = [];
+        const date = new Date();
+        const startYear = 2026;
+        const startMonth = 0; // January
+        
+        while (date.getFullYear() > startYear || (date.getFullYear() === startYear && date.getMonth() >= startMonth)) {
+            const val = date.toISOString().slice(0, 7);
+            const label = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+            options.push({ value: val, label });
+            date.setMonth(date.getMonth() - 1);
+        }
+        return options;
+    }, []);
+
+    const getNextMonthLabel = (monthStr) => {
+        if (!monthStr) return "";
+        const [y, m] = monthStr.split('-');
+        const date = new Date(y, parseInt(m) - 1, 1);
+        date.setMonth(date.getMonth() + 1);
+        return date.toLocaleString('default', { month: 'long', year: 'numeric' });
+    };
+
     // Form Data
     const [formData, setFormData] = useState({
         productId: '',
@@ -23,14 +49,17 @@ const SalesmanDashboard = () => {
 
     useEffect(() => {
         fetchAllData(); // Fetch products, salesmen, etc.
-        fetchDashboardStats();
     }, [fetchAllData]);
+
+    useEffect(() => {
+        fetchDashboardStats();
+    }, [selectedMonth]);
 
     const fetchDashboardStats = async () => {
         setIsLoadingStats(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:8001/api/analytics/salesman/dashboard/', {
+            const response = await fetch(`http://localhost:8001/api/analytics/salesman/dashboard/?month=${selectedMonth}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -95,6 +124,12 @@ const SalesmanDashboard = () => {
             notes: formData.notes
         };
 
+        const product = products.find(p => p.id === parseInt(formData.productId));
+        if (product && parseInt(formData.quantity) > product.quantity) {
+            toast.error(`Out of Stock! Only ${product.quantity} units available.`);
+            return;
+        }
+
         const result = await addSale(salePayload);
         if (result.success) {
             toast.success("Sale recorded successfully!");
@@ -149,9 +184,20 @@ const SalesmanDashboard = () => {
                     <h1>Salesman Dashboard</h1>
                     <p>Welcome back! Here is your performance overview.</p>
                 </div>
-                <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-                    + Record Sale
-                </button>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <select
+                        value={selectedMonth}
+                        onChange={(e) => setSelectedMonth(e.target.value)}
+                        className="px-4 py-2 border border-gray-200 rounded-xl bg-white shadow-sm font-medium text-slate-700 cursor-pointer focus:ring-2 focus:ring-blue-500 outline-none"
+                    >
+                        {monthOptions.map(m => (
+                            <option key={m.value} value={m.value}>{m.label}</option>
+                        ))}
+                    </select>
+                    <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+                        + Record Sale
+                    </button>
+                </div>
             </header>
 
             {/* KPI Cards */}
@@ -166,7 +212,7 @@ const SalesmanDashboard = () => {
                     <div className="progress-bar">
                         <div
                             className="progress-fill"
-                            style={{ width: `₹{Math.min(stats.kpi.achieved_percent, 100)}%` }}
+                            style={{ width: `${Math.min(stats.kpi.achieved_percent, 100)}%` }}
                         ></div>
                     </div>
                     <small>Target: ₹{stats.kpi.target.toLocaleString()}</small>
@@ -183,7 +229,7 @@ const SalesmanDashboard = () => {
 
             {/* Prediction Widget */}
             <div className="prediction-widget">
-                <h3>🔮 Future Sales Forecast</h3>
+                <h3> Future Sales Forecast ({getNextMonthLabel(selectedMonth)})</h3>
                 <div className="prediction-content">
                     <div className="prediction-value">
                         ₹{stats.prediction.predicted_next_month?.toLocaleString() || "N/A"}
@@ -322,8 +368,11 @@ const SalesmanDashboard = () => {
                             </div>
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label>Quantity</label>
+                                    <label>Quantity (Available: {products.find(p => p.id === parseInt(formData.productId))?.quantity || 0})</label>
                                     <input type="number" name="quantity" value={formData.quantity} onChange={handleInput} required />
+                                    {formData.productId && formData.quantity && products.find(p => p.id === parseInt(formData.productId))?.quantity <= (products.find(p => p.id === parseInt(formData.productId))?.low_stock_threshold || 10) && (
+                                        <p style={{ color: '#f59e0b', fontSize: '11px', marginTop: '4px', fontWeight: 'bold' }}>⚠️ Low Stock Warning!</p>
+                                    )}
                                 </div>
                                 <div className="form-group">
                                     <label>Amount</label>

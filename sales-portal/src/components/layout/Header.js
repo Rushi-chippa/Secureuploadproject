@@ -10,7 +10,7 @@ const Header = ({ user, company }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
     const { logout } = useAuth();
-    const { products, salesmen, sales } = useData();
+    const { products, salesmen, sales, lowStockProducts } = useData();
 
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -72,7 +72,16 @@ const Header = ({ user, company }) => {
             };
         });
 
+        const stockNotifs = (user?.role === 'manager' && lowStockProducts) ? lowStockProducts.map(p => ({
+            id: `stock-${p.id}`,
+            title: 'Low Stock Alert!',
+            message: `${p.name} is low on stock (${p.quantity} left).`,
+            time: 'System',
+            icon: '🛒'
+        })) : [];
+
         setNotifications([
+            ...stockNotifs,
             ...recentNotifs,
             { id: 'welcome', title: 'Welcome to SalesPortal', message: 'You have caught up with all notifications.', time: 'System', icon: '👋' }
         ]);
@@ -90,7 +99,7 @@ const Header = ({ user, company }) => {
     return (
         <header className="header">
             <div className="header-left">
-                <Link to="/dashboard" className="header-logo">
+                <Link to={user?.role === 'salesman' ? '/salesman-dashboard' : '/dashboard'} className="header-logo">
                     <span className="logo-icon">🏢</span>
                     <span className="logo-text">SalesPortal</span>
                 </Link>

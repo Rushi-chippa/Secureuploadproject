@@ -82,6 +82,7 @@ def read_root():
 
 @app.get("/api/predict-sales")
 def get_prediction(
+    month: str = None,
     current_user: auth_models.User = Depends(utils.get_current_active_user)
 ):
     """
@@ -89,9 +90,22 @@ def get_prediction(
     """
     try:
         from sales_predictor import SalesPredictor
+        import datetime
+        from calendar import monthrange
+
         predictor = SalesPredictor()
         user_id = current_user.id if current_user.role == "salesman" else None
-        return predictor.get_full_forecast(company_id=current_user.company_id, user_id=user_id)
+
+        pass_end_date = None
+        if month:
+            try:
+                year, m = map(int, month.split('-'))
+                end_date_day = monthrange(year, m)[1]
+                pass_end_date = datetime.datetime(year, m, end_date_day, 23, 59, 59)
+            except Exception as e:
+                print(f"Invalid month forecast format: {month}")
+
+        return predictor.get_full_forecast(company_id=current_user.company_id, user_id=user_id, end_date=pass_end_date)
     except Exception as e:
         print(f"Error generating prediction: {e}")
         return {

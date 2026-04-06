@@ -79,7 +79,7 @@ export const DataProvider = ({ children }) => {
         try {
             const response = await dataService.addSalesman(salesmanData);
             setSalesmen([...salesmen, response.data]);
-            return { success: true };
+            return { success: true, data: response.data };
         } catch (err) {
             return { success: false, message: err.message };
         }
@@ -99,6 +99,24 @@ export const DataProvider = ({ children }) => {
         try {
             await dataService.deleteSalesman(id);
             setSalesmen(salesmen.filter(s => s.id !== id));
+            return { success: true };
+        } catch (err) {
+            return { success: false, message: err.message };
+        }
+    };
+
+    const updateSalesmanTarget = async (id, month, target) => {
+        try {
+            await dataService.setSalesmanTarget(id, month, target);
+            // Updating local state
+            setSalesmen(salesmen.map(s => {
+                if (s.id === id) {
+                    const existing = s.monthly_targets || [];
+                    const updatedMt = [...existing.filter(m => m.month !== month), { month, target_amount: parseFloat(target) }];
+                    return { ...s, monthly_targets: updatedMt };
+                }
+                return s;
+            }));
             return { success: true };
         } catch (err) {
             return { success: false, message: err.message };
@@ -131,6 +149,15 @@ export const DataProvider = ({ children }) => {
         try {
             const response = await dataService.addSale(saleData);
             setSales([...sales, response.data]);
+            
+            // Update local product stock
+            setProducts(currentProducts => currentProducts.map(p => {
+                if (p.id === saleData.product_id) {
+                    return { ...p, quantity: p.quantity - saleData.quantity };
+                }
+                return p;
+            }));
+            
             return { success: true };
         } catch (err) {
             return { success: false, message: err.message };
@@ -139,8 +166,20 @@ export const DataProvider = ({ children }) => {
 
     const deleteSale = async (id) => {
         try {
+            const saleToDelete = sales.find(s => s.id === id);
             await dataService.deleteSale(id);
             setSales(sales.filter(s => s.id !== id));
+            
+            // Restore local product stock
+            if (saleToDelete) {
+                setProducts(currentProducts => currentProducts.map(p => {
+                    if (p.id === saleToDelete.product_id) {
+                        return { ...p, quantity: p.quantity + saleToDelete.quantity };
+                    }
+                    return p;
+                }));
+            }
+            
             return { success: true };
         } catch (err) {
             return { success: false, message: err.message };
@@ -184,8 +223,11 @@ export const DataProvider = ({ children }) => {
         };
     }, [sales, products, salesmen]);
 
+    const lowStockProducts = React.useMemo(() => {
+        return products.filter(p => p.quantity <= (p.low_stock_threshold || 10));
+    }, [products]);
+
     const value = {
-        products,
         products,
         salesmen,
         customers,
@@ -199,6 +241,7 @@ export const DataProvider = ({ children }) => {
         addSalesman,
         updateSalesman,
         deleteSalesman,
+        updateSalesmanTarget,
         addCustomer,
         deleteCustomer,
         addSale,

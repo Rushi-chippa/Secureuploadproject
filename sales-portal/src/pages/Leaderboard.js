@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import api from '../services/api';
+import { dataService } from '../services/dataService';
 
 const Leaderboard = () => {
     const { user } = useAuth();
@@ -8,12 +8,13 @@ const Leaderboard = () => {
     const [companyName, setCompanyName] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
 
     useEffect(() => {
         const fetchLeaderboard = async () => {
+            setLoading(true);
             try {
-                // Corrected endpoint with /api prefix
-                const response = await api.get('/api/analytics/leaderboard');
+                const response = await dataService.getLeaderboard({ month: selectedMonth });
                 setCompanyName(response.data.company_name);
                 setLeaderboardData(response.data.leaderboard);
             } catch (error) {
@@ -35,7 +36,19 @@ const Leaderboard = () => {
         };
 
         fetchLeaderboard();
-    }, []);
+    }, [selectedMonth]);
+
+    const handleMonthChange = (offset) => {
+        const current = new Date(selectedMonth + "-01");
+        current.setMonth(current.getMonth() + offset);
+        setSelectedMonth(current.toISOString().slice(0, 7));
+    };
+
+    const formatMonth = (isoMonth) => {
+        const [year, month] = isoMonth.split('-');
+        const date = new Date(year, month - 1);
+        return date.toLocaleString('default', { month: 'long', year: 'numeric' });
+    };
 
     if (loading) return <div className="p-10 text-center text-slate-500">Loading Leaderboard...</div>;
 
@@ -60,9 +73,17 @@ const Leaderboard = () => {
 
     return (
         <div className="p-6 min-h-screen bg-slate-50">
-            <div className="text-center mb-10">
-                <h1 className="text-3xl font-bold text-slate-800 mb-2">🏆 Sales Leaderboard</h1>
-                <p className="text-slate-500">Top performers at <span className="font-semibold text-blue-600">{companyName}</span></p>
+            <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+                <div className="text-center md:text-left">
+                    <h1 className="text-3xl font-bold text-slate-800 mb-2">🏆 Sales Leaderboard</h1>
+                    <p className="text-slate-500">Top performers at <span className="font-semibold text-blue-600">{companyName}</span></p>
+                </div>
+
+                <div className="flex items-center gap-4 bg-white p-2 rounded-xl shadow-sm border border-slate-100">
+                    <button onClick={() => handleMonthChange(-1)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500">←</button>
+                    <span className="font-semibold text-slate-700 w-32 text-center select-none">{formatMonth(selectedMonth)}</span>
+                    <button onClick={() => handleMonthChange(1)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500">→</button>
+                </div>
             </div>
 
             {/* Podium Section */}

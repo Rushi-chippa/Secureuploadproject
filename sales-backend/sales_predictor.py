@@ -12,7 +12,7 @@ class SalesPredictor:
         # Initialize with dummy training if DB is empty
         self.train_model()
 
-    def load_data_from_db(self, user_id=None, company_id=None):
+    def load_data_from_db(self, user_id=None, company_id=None, end_date=None):
         db: Session = SessionLocal()
         try:
             query = db.query(Sale)
@@ -20,6 +20,8 @@ class SalesPredictor:
                 query = query.filter(Sale.user_id == user_id)
             if company_id:
                 query = query.filter(Sale.company_id == company_id)
+            if end_date:
+                query = query.filter(Sale.date <= end_date)
             
             sales = query.order_by(Sale.date).all()
             if not sales:
@@ -42,8 +44,8 @@ class SalesPredictor:
         finally:
             db.close()
 
-    def train_model(self, user_id=None, company_id=None):
-        self.df = self.load_data_from_db(user_id=user_id, company_id=company_id)
+    def train_model(self, user_id=None, company_id=None, end_date=None):
+        self.df = self.load_data_from_db(user_id=user_id, company_id=company_id, end_date=end_date)
 
         
         if self.df.empty or len(self.df) < 2:
@@ -56,19 +58,22 @@ class SalesPredictor:
         self.model.fit(X, y)
         self.model_trained = True
 
-    def predict_next_months(self, months=6):
+    def predict_next_months(self, months=6, base_date=None):
         if not hasattr(self, 'model_trained') or not self.model_trained:
             # Return dummy prediction or empty if no data
             return []
 
         future_months = []
-        last_item = self.df.iloc[-1]
-        last_ordinal = last_item['month_ordinal']
-        last_date = last_item['month_start']
+        if base_date is not None:
+            # Base it strictly on the provided end_date's month
+            current_date = pd.to_datetime(base_date).to_period('M').to_timestamp()
+        else:
+            last_item = self.df.iloc[-1]
+            current_date = last_item['month_start']
         
         for i in range(1, months + 1):
             # Approx next month ordinal
-            next_date = last_date + pd.DateOffset(months=i)
+            next_date = current_date + pd.DateOffset(months=i)
             next_ordinal = next_date.toordinal()
             
             prediction = self.model.predict([[next_ordinal]])[0]
@@ -84,8 +89,8 @@ class SalesPredictor:
             
         return future_months
 
-    def get_full_forecast(self, user_id=None, company_id=None):
-        self.train_model(user_id=user_id, company_id=company_id) # Retrain with filtered data
+    def get_full_forecast(self, user_id=None, company_id=None, end_date=None):
+        self.train_model(user_id=user_id, company_id=company_id, end_date=end_date) # Retrain with filtered data
         
         if not hasattr(self, 'model_trained') or not self.model_trained:
              return {
@@ -102,7 +107,7 @@ class SalesPredictor:
                 'is_prediction': False
             })
             
-        future = self.predict_next_months(6)
+        future = self.predict_next_months(6, base_date=end_date)
         
         return {
             'history': history,

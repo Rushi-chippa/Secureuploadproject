@@ -246,3 +246,46 @@ def register_salesman(salesman_data: schemas.SalesmanRegisterRequest, db: Sessio
         traceback.print_exc()
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+
+from utils.email_utils import send_reset_password_email
+import secrets
+from datetime import datetime, timedelta
+
+@router.post("/forgot-password")
+def forgot_password(request: schemas.ForgotPasswordRequest, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.email == request.email).first()
+    if not user:
+        # For security, don't reveal if user exists. 
+        # Just say if email exists, instructions sent.
+        return {"message": "If this email is registered, instructions will be sent shortly."}
+    
+    # Generate Token
+    token = secrets.token_urlsafe(32)
+    user.reset_token = token
+    user.reset_token_expires = datetime.utcnow() + timedelta(minutes=30)
+    
+    db.commit()
+    
+    # Send Email (currently prints to console)
+    send_reset_password_email(user.email, token)
+    
+    return {"message": "If this email is registered, instructions will be sent shortly."}
+
+@router.post("/reset-password")
+def reset_password(request: schemas.ResetPasswordRequest, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(
+        models.User.reset_token == request.token,
+        models.User.reset_token_expires > datetime.utcnow()
+    ).first()
+    
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid or expired token")
+    
+    # Update Password
+    user.hashed_password = utils.get_password_hash(request.new_password)
+    user.reset_token = None
+    user.reset_token_expires = None
+    
+    db.commit()
+    
+    return {"message": "Password updated successfully"}

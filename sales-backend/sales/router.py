@@ -144,6 +144,19 @@ def create_sale(
         # Salesman always assigns to self
         target_user_id = current_user.id
 
+    # 1. Update Product Stockholm
+    product = db.query(Product).filter(Product.id == sale.product_id, Product.company_id == current_user.company_id).first()
+    if not product:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    if product.quantity < sale.quantity:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail=f"Insufficient stock. Only {product.quantity} units available.")
+    
+    # Subtract stock
+    product.quantity -= sale.quantity
+
     new_sale = Sale(
         product_id=sale.product_id,
         quantity=sale.quantity,
@@ -158,6 +171,7 @@ def create_sale(
     db.add(new_sale)
     db.commit()
     db.refresh(new_sale)
+    db.refresh(product)
     return new_sale
 
 @router.delete("/{sale_id}")
@@ -175,8 +189,14 @@ def delete_sale(
         
     sale = query.first()
     if not sale:
+        from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Sale not found")
+    
+    # Add stock back to product
+    product = db.query(Product).filter(Product.id == sale.product_id).first()
+    if product:
+        product.quantity += sale.quantity
         
     db.delete(sale)
     db.commit()
-    return {"message": "Sale deleted successfully"}
+    return {"message": "Sale deleted and stock restored successfully"}

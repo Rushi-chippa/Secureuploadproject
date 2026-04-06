@@ -15,6 +15,8 @@ import { DataProvider } from './context/DataContext';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import SalesmanRegister from './pages/SalesmanRegister';
 import SalesmanDashboard from './pages/SalesmanDashboard';
 import Dashboard from './pages/Dashboard';
@@ -79,6 +81,8 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/register-salesman" element={<SalesmanRegister />} />
                 <Route path="/salesman-dashboard" element={<ProtectedRoute><SalesmanDashboard /></ProtectedRoute>} />
 

@@ -35,10 +35,23 @@ const Analytics = () => {
     const [predictionData, setPredictionData] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const [dateRange, setDateRange] = useState({
-        start: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0],
-        end: new Date().toISOString().split('T')[0],
-    });
+    const currentMonthStr = new Date().toISOString().slice(0, 7);
+    const [selectedMonth, setSelectedMonth] = useState(currentMonthStr);
+
+    const monthOptions = React.useMemo(() => {
+        const options = [];
+        const date = new Date();
+        const startYear = 2026;
+        const startMonth = 0; // January
+        
+        while (date.getFullYear() > startYear || (date.getFullYear() === startYear && date.getMonth() >= startMonth)) {
+            const val = date.toISOString().slice(0, 7);
+            const label = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+            options.push({ value: val, label });
+            date.setMonth(date.getMonth() - 1);
+        }
+        return options;
+    }, []);
 
     const [rfmData, setRfmData] = useState([]);
     const [abcData, setAbcData] = useState({});
@@ -49,13 +62,19 @@ const Analytics = () => {
 
             setLoading(true);
             try {
+                // Calculate start and end date for the selected month to pass to `/reports` API
+                const [year, m] = selectedMonth.split('-');
+                const startDate = `${year}-${m}-01`;
+                const endDay = new Date(year, m, 0).getDate();
+                const endDate = `${year}-${m}-${endDay}`;
+
                 // Fetch basic report data
-                const reportRes = await getReportsData({ start_date: dateRange.start, end_date: dateRange.end });
+                const reportRes = await getReportsData({ start_date: startDate, end_date: endDate });
                 setReportData(reportRes.data);
 
                 // Fetch AI Predictions & Advanced Analytics
                 const [predictRes, rfmRes, abcRes] = await Promise.all([
-                    getPredictions(),
+                    getPredictions({ month: selectedMonth }),
                     dataService.getRFMAnalysis(),
                     dataService.getABCAnalysis()
                 ]);
@@ -71,7 +90,7 @@ const Analytics = () => {
             }
         };
         fetchData();
-    }, [dateRange, getReportsData, getPredictions]);
+    }, [selectedMonth, getReportsData, getPredictions]);
 
     if (loading) {
         return <div className="p-6">Loading analytics...</div>;
@@ -292,20 +311,16 @@ const Analytics = () => {
                     <p className="text-slate-500">Visual insights and AI predictions</p>
                 </div>
 
-                <div className="flex items-center gap-2 bg-white p-1 rounded-lg border border-gray-200">
-                    <input
-                        type="date"
-                        value={dateRange.start}
-                        onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-                        className="bg-transparent border-none text-sm text-slate-600 focus:ring-0"
-                    />
-                    <span className="text-slate-400">-</span>
-                    <input
-                        type="date"
-                        value={dateRange.end}
-                        onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-                        className="bg-transparent border-none text-sm text-slate-600 focus:ring-0"
-                    />
+                <div>
+                    <select 
+                        value={selectedMonth} 
+                        onChange={(e) => setSelectedMonth(e.target.value)}
+                        className="px-4 py-2 border border-gray-200 rounded-xl bg-white shadow-sm font-medium text-slate-700 cursor-pointer focus:ring-2 focus:ring-blue-500 outline-none"
+                    >
+                        {monthOptions.map(m => (
+                            <option key={m.value} value={m.value}>{m.label}</option>
+                        ))}
+                    </select>
                 </div>
             </div>
 

@@ -48,8 +48,8 @@ const Performance = () => {
                 });
                 setSales(salesResponse.data);
 
-                // Fetch Leaderboard (Lifetime) - Now visible to everyone as requested
-                const leaderboardResponse = await dataService.getLeaderboard();
+                // Fetch Leaderboard for the month
+                const leaderboardResponse = await dataService.getLeaderboard({ month: selectedMonth });
                 setLeaderboard(leaderboardResponse.data.leaderboard);
 
             } catch (error) {
@@ -152,16 +152,24 @@ const Performance = () => {
             {/* Salesman Leaderboard (Visible to everyone) */}
             {leaderboard.length > 0 && (
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-8">
-                    <h3 className="text-lg font-bold text-slate-800 mb-4">🏆 Top Performing Salesmen (All Time)</h3>
+                    <h3 className="text-lg font-bold text-slate-800 mb-4">🏆 Top Performing Salesmen ({formatMonth(selectedMonth)})</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {leaderboard.map((salesman, index) => (
-                            <div key={index} className="flex items-center p-4 bg-slate-50 rounded-xl border border-slate-100">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold mr-4 ${index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : index === 2 ? 'bg-amber-600' : 'bg-slate-400'}`}>
-                                    {index + 1}
+                            <div key={index} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : index === 2 ? 'bg-amber-600' : 'bg-slate-400'}`}>
+                                        {index + 1}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-slate-800">{salesman.name}</p>
+                                        <p className="text-sm text-slate-500">₹{salesman.revenue.toLocaleString()} Revenue</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="font-bold text-slate-800">{salesman.name}</p>
-                                    <p className="text-sm text-slate-500">₹{salesman.revenue.toLocaleString()} Revenue</p>
+                                <div className="text-right">
+                                    <p className="text-sm font-semibold text-slate-700">TGT: ₹{salesman.sales_target.toLocaleString()}</p>
+                                    <p className={`text-xs font-bold ${salesman.achieved_percent >= 100 ? 'text-green-600' : 'text-blue-600'}`}>
+                                        {Math.round(salesman.achieved_percent)}% Done
+                                    </p>
                                 </div>
                             </div>
                         ))}

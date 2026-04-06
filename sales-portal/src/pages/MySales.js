@@ -12,8 +12,40 @@ const MySales = () => {
     const { user } = useAuth();
     const location = useLocation();
 
-    // Filter sales to show only the current user's sales
-    const mySales = sales.filter(s => s.user_id === user.id);
+    const currentMonthStr = new Date().toISOString().slice(0, 7);
+    const [selectedMonth, setSelectedMonth] = useState(currentMonthStr);
+    const [fromDate, setFromDate] = useState('');
+    const [toDate, setToDate] = useState('');
+
+    const monthOptions = React.useMemo(() => {
+        const options = [];
+        const date = new Date();
+        const startYear = 2026;
+        const startMonth = 0; // January
+        
+        while (date.getFullYear() > startYear || (date.getFullYear() === startYear && date.getMonth() >= startMonth)) {
+            const val = date.toISOString().slice(0, 7);
+            const label = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+            options.push({ value: val, label });
+            date.setMonth(date.getMonth() - 1);
+        }
+        return options;
+    }, []);
+
+    // Filter sales to show only the current user's sales and apply generic date filters
+    let mySales = sales.filter(s => s.user_id === user.id);
+    
+    if (fromDate || toDate) {
+        mySales = mySales.filter(s => {
+            const saleDate = new Date(s.date);
+            const from = fromDate ? new Date(fromDate) : new Date('1900-01-01');
+            const to = toDate ? new Date(toDate) : new Date('2100-01-01');
+            to.setHours(23, 59, 59, 999);
+            return saleDate >= from && saleDate <= to;
+        });
+    } else if (selectedMonth) {
+        mySales = mySales.filter(s => s.date.startsWith(selectedMonth));
+    }
 
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this sale?')) {
@@ -109,26 +141,74 @@ const MySales = () => {
 
     return (
         <div className="p-6 bg-slate-50 min-h-screen">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-800">My Sales</h1>
-                    <p className="text-slate-500 mt-1">Track your personal sales performance</p>
+            <div className="flex flex-col mb-8 gap-4">
+                <div className="flex justify-between items-start md:items-center">
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-800">My Sales</h1>
+                        <p className="text-slate-500 mt-1">Track your personal sales performance</p>
+                    </div>
+                    <div className="flex gap-3">
+                        <button
+                            onClick={exportToPDF}
+                            disabled={mySales.length === 0}
+                            className={`flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-medium transition-all shadow-sm hover:shadow-md ${mySales.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                            <span>📄</span> PDF
+                        </button>
+                        <button
+                            onClick={exportToCSV}
+                            disabled={mySales.length === 0}
+                            className={`flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl font-medium transition-all shadow-sm hover:shadow-md ${mySales.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                            <span>📊</span> CSV
+                        </button>
+                    </div>
                 </div>
-                <div className="flex gap-3">
-                    <button
-                        onClick={exportToPDF}
-                        disabled={mySales.length === 0}
-                        className={`flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-medium transition-all shadow-sm hover:shadow-md ${mySales.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    >
-                        <span>📄</span> PDF
-                    </button>
-                    <button
-                        onClick={exportToCSV}
-                        disabled={mySales.length === 0}
-                        className={`flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl font-medium transition-all shadow-sm hover:shadow-md ${mySales.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    >
-                        <span>📊</span> CSV
-                    </button>
+
+                {/* Filters */}
+                <div className="flex flex-wrap items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium text-slate-600 font-semibold">Month:</label>
+                        <select
+                            value={selectedMonth}
+                            onChange={(e) => { setSelectedMonth(e.target.value); setFromDate(''); setToDate(''); }}
+                            className="px-3 py-2 border border-gray-200 rounded-lg bg-white shadow-sm font-medium text-slate-700 outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="">All Time</option>
+                            {monthOptions.map(m => (
+                                <option key={m.value} value={m.value}>{m.label}</option>
+                            ))}
+                        </select>
+                    </div>
+                    
+                    <span className="text-slate-400 text-sm font-medium px-2">OR Custom Range:</span>
+                    
+                    <div className="flex items-center gap-2">
+                        <input 
+                            type="date" 
+                            title="From Date"
+                            value={fromDate}
+                            onChange={(e) => { setFromDate(e.target.value); setSelectedMonth(''); }}
+                            className="px-3 py-2 border border-gray-200 rounded-lg bg-white shadow-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-slate-400">-</span>
+                        <input 
+                            type="date" 
+                            title="To Date"
+                            value={toDate}
+                            onChange={(e) => { setToDate(e.target.value); setSelectedMonth(''); }}
+                            className="px-3 py-2 border border-gray-200 rounded-lg bg-white shadow-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+
+                    {(fromDate || toDate || selectedMonth) && (
+                        <button 
+                            onClick={() => { setFromDate(''); setToDate(''); setSelectedMonth(''); }}
+                            className="px-3 py-2 ml-auto text-sm font-bold text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                            Clear Filters
+                        </button>
+                    )}
                 </div>
             </div>
 

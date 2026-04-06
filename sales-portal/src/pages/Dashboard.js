@@ -31,12 +31,31 @@ const Dashboard = () => {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const currentMonthStr = new Date().toISOString().slice(0, 7);
+    const [selectedMonth, setSelectedMonth] = useState(currentMonthStr);
+
+    const monthOptions = React.useMemo(() => {
+        const options = [];
+        const date = new Date();
+        const startYear = 2026;
+        const startMonth = 0; // January
+        
+        while (date.getFullYear() > startYear || (date.getFullYear() === startYear && date.getMonth() >= startMonth)) {
+            const val = date.toISOString().slice(0, 7);
+            const label = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+            options.push({ value: val, label });
+            date.setMonth(date.getMonth() - 1);
+        }
+        return options;
+    }, []);
+
     useEffect(() => {
         const loadData = async () => {
+            setLoading(true);
             try {
                 await fetchAllData();
                 const [statsRes, kpiRes] = await Promise.all([
-                    getDashboardStats(),
+                    getDashboardStats({ month: selectedMonth }),
                     dataService.getExecutiveKPIs()
                 ]);
                 setStats({ ...statsRes.data, kpis: kpiRes.data });
@@ -47,7 +66,7 @@ const Dashboard = () => {
             }
         };
         loadData();
-    }, [fetchAllData, getDashboardStats]);
+    }, [fetchAllData, getDashboardStats, selectedMonth]);
 
     if (loading) {
         return <div className="p-6">Loading dashboard...</div>;
@@ -57,13 +76,13 @@ const Dashboard = () => {
         return <div className="p-6">Failed to load dashboard data.</div>;
     }
 
-    const { total_revenue, total_orders, avg_order_value, recent_sales } = stats;
+    const { total_revenue, total_orders, avg_order_value, recent_sales, total_company_target, achieved_percent } = stats;
 
-    // --- CHART 1: Current Month Daily Trend (Line Chart) ---
+    // --- CHART 1: Selected Month Daily Trend (Line Chart) ---
     const currentMonthSales = {};
-    const today = new Date();
-    const currentMonthIndex = today.getMonth();
-    const currentYear = today.getFullYear();
+    const [selectedYear, selectedMonthIndexString] = selectedMonth.split('-');
+    const currentYear = parseInt(selectedYear, 10);
+    const currentMonthIndex = parseInt(selectedMonthIndexString, 10) - 1;
     const daysInMonth = new Date(currentYear, currentMonthIndex + 1, 0).getDate();
 
     // Initialize all days with 0
@@ -71,12 +90,15 @@ const Dashboard = () => {
         currentMonthSales[i] = 0;
     }
 
-    sales.forEach(sale => {
+    const filteredLocalSales = sales.filter(sale => {
         const saleDate = new Date(sale.date);
-        if (saleDate.getMonth() === currentMonthIndex && saleDate.getFullYear() === currentYear) {
-            const day = saleDate.getDate();
-            currentMonthSales[day] += sale.amount;
-        }
+        return saleDate.getMonth() === currentMonthIndex && saleDate.getFullYear() === currentYear;
+    });
+
+    filteredLocalSales.forEach(sale => {
+        const saleDate = new Date(sale.date);
+        const day = saleDate.getDate();
+        currentMonthSales[day] += sale.amount;
     });
 
     const dailyLabels = Object.keys(currentMonthSales).map(day => `Day ${day}`);
@@ -101,7 +123,7 @@ const Dashboard = () => {
         responsive: true,
         plugins: {
             legend: { display: false },
-            title: { display: true, text: `Sales Trend - ${today.toLocaleString('default', { month: 'long' })}` }
+            title: { display: true, text: `Sales Trend - ${new Date(currentYear, currentMonthIndex).toLocaleString('default', { month: 'long', year: 'numeric' })}` }
         },
         scales: {
             y: { beginAtZero: true, grid: { display: true, drawBorder: false } },
@@ -175,9 +197,22 @@ const Dashboard = () => {
     return (
         <div className="p-6 space-y-6 bg-slate-50 min-h-screen">
             {/* Header */}
-            <div>
-                <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
-                <p className="text-slate-500">Welcome back! Here's what's happening today.</p>
+            <div className="flex justify-between items-center mb-6">
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
+                    <p className="text-slate-500">Welcome back! Here's your performance overview.</p>
+                </div>
+                <div>
+                    <select 
+                        value={selectedMonth} 
+                        onChange={(e) => setSelectedMonth(e.target.value)}
+                        className="px-4 py-2 border border-gray-200 rounded-xl bg-white shadow-sm font-medium text-slate-700 cursor-pointer focus:ring-2 focus:ring-blue-500 outline-none"
+                    >
+                        {monthOptions.map(m => (
+                            <option key={m.value} value={m.value}>{m.label}</option>
+                        ))}
+                    </select>
+                </div>
             </div>
 
             {/* Stats Grid */}
@@ -209,10 +244,19 @@ const Dashboard = () => {
 
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center text-2xl">📈</div>
-                        <div>
-                            <p className="text-sm font-medium text-slate-500">Avg. Order Value</p>
-                            <p className="text-2xl font-bold text-slate-800">₹{avg_order_value}</p>
+                        <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-2xl">🎯</div>
+                        <div className="flex-1">
+                            <p className="text-sm font-medium text-slate-500">Target Achievement</p>
+                            <div className="flex justify-between items-end">
+                                <p className="text-2xl font-bold text-slate-800">{achieved_percent}%</p>
+                                <p className="text-xs text-slate-400 mb-1">Target: ₹{total_company_target.toLocaleString()}</p>
+                            </div>
+                            <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                                <div 
+                                    className="h-full bg-orange-500 transition-all duration-500" 
+                                    style={{ width: `${Math.min(achieved_percent, 100)}%` }}
+                                ></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -260,7 +304,7 @@ const Dashboard = () => {
                             }
                         }}
                         data={{
-                            labels: Object.entries(sales.reduce((acc, sale) => {
+                            labels: Object.entries(filteredLocalSales.reduce((acc, sale) => {
                                 acc[sale.product_name] = (acc[sale.product_name] || 0) + sale.amount;
                                 return acc;
                             }, {}))
@@ -269,7 +313,7 @@ const Dashboard = () => {
                                 .map(([name]) => name),
                             datasets: [{
                                 label: 'Revenue',
-                                data: Object.entries(sales.reduce((acc, sale) => {
+                                data: Object.entries(filteredLocalSales.reduce((acc, sale) => {
                                     acc[sale.product_name] = (acc[sale.product_name] || 0) + sale.amount;
                                     return acc;
                                 }, {}))

@@ -19,6 +19,7 @@ class Product(Base):
     category = Column(String)
     price = Column(Float)
     quantity = Column(Integer, default=0)
+    low_stock_threshold = Column(Integer, default=10)
     status = Column(String, default="active")
     description = Column(String, nullable=True)
     company_id = Column(Integer, ForeignKey("companies.id"))
@@ -31,6 +32,7 @@ class ProductBase(BaseModel):
     category: str
     price: float
     quantity: int = 0
+    low_stock_threshold: int = 10
     status: str = "active"
     description: Optional[str] = None
 

@@ -38,6 +38,7 @@ const Products = () => {
         quantity: '',
         category: '',
         description: '',
+        low_stock_threshold: '10',
     });
 
     const resetForm = () => {
@@ -47,6 +48,7 @@ const Products = () => {
             quantity: '',
             category: '',
             description: '',
+            low_stock_threshold: '10',
         });
         setEditingProduct(null);
         setShowModal(false);
@@ -59,6 +61,7 @@ const Products = () => {
             ...formData,
             price: parseFloat(formData.price),
             quantity: parseInt(formData.quantity),
+            low_stock_threshold: parseInt(formData.low_stock_threshold || 10),
         };
 
         let result;
@@ -85,6 +88,7 @@ const Products = () => {
             quantity: product.quantity,
             category: product.category,
             description: product.description,
+            low_stock_threshold: product.low_stock_threshold,
         });
         setShowModal(true);
     };
@@ -159,8 +163,11 @@ const Products = () => {
                                         </td>
                                         <td className="price">₹{product.price.toFixed(2)}</td>
                                         <td>
-                                            <span className={`quantity ${product.quantity < 10 ? 'low' : ''}`}>
+                                            <span className={`quantity ${product.quantity <= (product.low_stock_threshold || 10) ? 'low' : ''}`}>
                                                 {product.quantity}
+                                                {product.quantity <= (product.low_stock_threshold || 10) && (
+                                                    <span className="ml-1" title="Low Stock">⚠️</span>
+                                                )}
                                             </span>
                                         </td>
                                         {user?.role !== 'salesman' && (
@@ -257,6 +264,20 @@ const Products = () => {
                                         onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
                                         required
                                         className="input-field"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Low Stock Alert Threshold *</label>
+                                    <input
+                                        type="number"
+                                        value={formData.low_stock_threshold}
+                                        onChange={(e) => setFormData({ ...formData, low_stock_threshold: e.target.value })}
+                                        required
+                                        className="input-field"
+                                        placeholder="e.g. 10"
                                     />
                                 </div>
                             </div>

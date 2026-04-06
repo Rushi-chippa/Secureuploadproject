@@ -33,5 +33,20 @@ class User(Base):
     sales_target = Column(Integer, nullable=True)
     company_id = Column(Integer, ForeignKey("companies.id"))
     created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Password Reset fields
+    reset_token = Column(String, nullable=True)
+    reset_token_expires = Column(DateTime, nullable=True)
 
     company = relationship("Company", back_populates="users")
+    monthly_targets = relationship("MonthlyTarget", back_populates="user")
+
+class MonthlyTarget(Base):
+    __tablename__ = "monthly_targets"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    month = Column(String, index=True) # Format: YYYY-MM
+    target_amount = Column(Integer, default=0)
+
+    user = relationship("User", back_populates="monthly_targets")
