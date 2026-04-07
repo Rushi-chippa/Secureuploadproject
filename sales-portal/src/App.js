@@ -35,6 +35,9 @@ import Categories from './pages/Categories';
 import Leaderboard from './pages/Leaderboard';
 import Performance from './pages/Performance';
 import AskAIPage from './pages/AskAIPage';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import Contact from './pages/Contact';
 
 // Components
 import Layout from './components/layout/Layout';
@@ -81,6 +84,9 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/contact" element={<Contact />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/register-salesman" element={<SalesmanRegister />} />
@@ -199,6 +205,7 @@ function App() {
 
                 <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
                 <Route path="/ask-ai" element={<ProtectedRoute><AskAIPage /></ProtectedRoute>} />
+                <Route path="/help" element={<ProtectedRoute><Contact /></ProtectedRoute>} />
 
                 {/* Catch all - redirect to home */}
                 <Route path="*" element={<Navigate to="/" />} />
