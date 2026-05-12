@@ -28,7 +28,7 @@
     --transition-normal: 0.25s ease;
 }
 
-[class="dark"] {
+.dark {
     --primary-color: #6366f1;
     /* lighter indigo for dark mode */
     --primary-hover: #818cf8;
@@ -55,12 +55,17 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    min-width: 0;
+    overflow-x: hidden;
+    max-width: 100vw;
     background: var(--bg-secondary);
 }
 
 .layout-body {
     display: flex;
     flex: 1;
+    overflow: hidden;
+    min-width: 0;
     margin-top: var(--header-height);
 }
 
@@ -68,19 +73,31 @@
    Header Styles
    ================================ */
 .header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
     height: var(--header-height);
-    background: var(--bg-primary);
+    background-color: var(--bg-primary);
     border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 24px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     z-index: 1000;
-    box-shadow: var(--shadow-sm);
+    box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 0 12px;
+    }
+    .header-center {
+        display: none;
+    }
+    .header-right {
+        gap: 4px;
+    }
 }
 
 .header-left {
@@ -180,6 +197,36 @@
 .help-btn:hover {
     background: var(--bg-tertiary);
 }
+
+/* Styled Help Button and Icon */
+.help-btn-link {
+    text-decoration: none;
+}
+
+.help-icon-styled {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+    border-radius: 50%;
+    color: white;
+    font-size: 15px;
+    font-weight: 900;
+    box-shadow: 0 2px 5px rgba(225, 29, 72, 0.3);
+    transition: all var(--transition-normal);
+}
+
+.help-btn:hover .help-icon-styled {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 4px 10px rgba(225, 29, 72, 0.4);
+}
+
+.help-btn:active .help-icon-styled {
+    transform: scale(0.95);
+}
+
 
 .notification-btn {
     position: relative;
@@ -353,6 +400,10 @@
     background: #fef2f2;
 }
 
+.dark .dropdown-item.logout:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
 .mobile-menu-btn {
     display: none;
     width: 40px;
@@ -364,15 +415,20 @@
 }
 
 .mobile-menu {
-    display: none;
     position: absolute;
-    top: var(--header-height);
+    top: 100%;
     left: 0;
     right: 0;
-    background: var(--bg-primary);
-    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
     padding: 16px;
-    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    max-height: calc(100vh - 70px);
+    overflow-y: auto;
 }
 
 .mobile-search input {
@@ -386,7 +442,23 @@
 .mobile-nav {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
+    padding-bottom: 20px;
+}
+
+.mobile-nav-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    padding-left: 12px;
+}
+
+.mobile-nav-section-title:first-child {
+    margin-top: 0;
 }
 
 .mobile-nav a {
@@ -402,6 +474,23 @@
 
 .mobile-nav a:hover {
     background: var(--bg-tertiary);
+}
+
+.mobile-nav a[aria-current="page"],
+.mobile-nav a.active {
+    background: var(--primary-light);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.mobile-search-result:hover {
+    background: var(--bg-tertiary);
+}
+
+.mobile-search input {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
 }
 
 /* ================================
@@ -610,6 +699,10 @@
     margin-left: var(--sidebar-width);
     transition: margin-left var(--transition-normal);
     min-height: calc(100vh - var(--header-height) - var(--footer-height));
+    min-width: 0;
+    max-width: 100vw;
+    display: flex;
+    flex-direction: column;
 }
 
 .layout-main.sidebar-collapsed {
@@ -712,7 +805,7 @@
     }
 
     .mobile-menu {
-        display: block;
+        display: flex; /* Changed from block to flex for better layout */
     }
 
     .profile-info,
@@ -735,17 +828,21 @@
     }
 
     .footer {
-        padding: 0 16px;
+        height: auto;
+        min-height: var(--footer-height);
+        padding: 16px;
     }
 
     .footer-content {
         flex-direction: column;
-        gap: 12px;
+        gap: 10px;
+        text-align: center;
     }
 
     .footer-left {
         flex-direction: column;
         gap: 4px;
+        align-items: center;
     }
 
     .footer-right {
@@ -755,16 +852,95 @@
 }
 
 @media (max-width: 480px) {
+    .header {
+        padding: 0 12px;
+        height: 56px;
+    }
+
+    .header-left {
+        gap: 8px;
+    }
+
+    .header-logo {
+        gap: 6px;
+    }
+
+    .header-logo .logo-icon {
+        font-size: 20px;
+    }
+
+    .logo-text {
+        font-size: 15px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .header-right {
+        gap: 6px;
+    }
+
+    .notification-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+
+    .mobile-menu-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: -4px;
+        padding-top: 2px;
+    }
+
+    .notification-badge {
+        top: 1px;
+        right: 1px;
+        width: 14px;
+        height: 14px;
+        font-size: 8px;
+    }
+
+    .help-btn,
+    .header-theme-toggle,
+    .header-divider {
+        display: none;
+    }
+
     .profile-btn {
-        padding: 6px;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .profile-avatar {
-        width: 32px;
-        height: 32px;
+        width: 24px;
+        height: 24px;
+    }
+
+    .profile-info,
+    .dropdown-arrow {
+        display: none;
     }
 
     .main-content {
         padding: 12px;
+    }
+
+    .mobile-menu {
+        z-index: 1001;
+    }
+
+    .profile-dropdown {
+        right: 8px;
+        width: calc(100vw - 16px);
+        max-width: 300px;
     }
 }

@@ -31,6 +31,36 @@ const Header = ({ user, company }) => {
     const filteredProducts = products?.filter(p => p.name?.toLowerCase().includes(searchQuery.toLowerCase()) || p.category?.toLowerCase().includes(searchQuery.toLowerCase())) || [];
     const filteredSalesmen = salesmen?.filter(s => s.name?.toLowerCase().includes(searchQuery.toLowerCase()) || s.email?.toLowerCase().includes(searchQuery.toLowerCase()) || s.full_name?.toLowerCase().includes(searchQuery.toLowerCase())) || [];
 
+    const navItems = [
+        { name: 'Dashboard', icon: '📊', path: user?.role === 'salesman' ? '/salesman-dashboard' : '/dashboard', keywords: 'dashboard home overview' },
+        { name: 'All Products', icon: '📦', path: '/products/list', keywords: 'products items inventory list' },
+        { name: 'Add Product', icon: '➕', path: '/products/add', keywords: 'add product create new' },
+        { name: 'Categories', icon: '📑', path: '/products/categories', keywords: 'categories groups types' },
+        { name: 'All Sales', icon: '💰', path: '/sales/list', keywords: 'sales orders transactions list' },
+        { name: 'My Sales', icon: '🧾', path: '/my-sales', keywords: 'my sales history records' },
+        { name: 'Record Sale', icon: '📝', path: '/sales/add', keywords: 'record sale add transaction' },
+        { name: 'Sales Report', icon: '📋', path: '/sales/report', keywords: 'sales report summary' },
+        { name: 'All Salesmen', icon: '👥', path: '/salesmen/list', keywords: 'salesmen team members list' },
+        { name: 'Add Salesman', icon: '👤+', path: '/salesmen/add', keywords: 'add salesman invite team' },
+        { name: 'Performance', icon: '🏆', path: '/salesmen/performance', keywords: 'performance rank leaderboard achievement' },
+        { name: 'Leaderboard', icon: '🥇', path: '/salesmen/leaderboard', keywords: 'leaderboard ranking top' },
+        { name: 'All Customers', icon: '🤝', path: '/customers/list', keywords: 'customers clients traders list' },
+        { name: 'Add Customer', icon: '👤+', path: '/customers/add', keywords: 'add customer create new client' },
+        { name: 'Analytics', icon: '📈', path: '/analytics', keywords: 'analytics charts reports data' },
+        { name: 'Ask AI', icon: '🤖', path: '/ask-ai', keywords: 'ask ai chatbot assistant askai' },
+        { name: 'Reports', icon: '📄', path: '/reports', keywords: 'reports export summary' },
+        { name: 'Settings', icon: '⚙️', path: '/settings', keywords: 'settings preferences config' },
+        { name: 'Profile', icon: '👤', path: '/profile', keywords: 'profile account me' },
+        { name: 'Help & Support', icon: '❓', path: '/help', keywords: 'help support faq contact' },
+    ];
+
+    const filteredNavItems = searchQuery
+        ? navItems.filter(item =>
+            item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.keywords.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        : [];
+
     // Notifications State
     const [notifications, setNotifications] = useState([
         { id: 'welcome', title: 'Welcome to SalesPortal', message: 'Get started by setting up your profile.', time: 'Just now', icon: '👋' },
@@ -100,7 +130,7 @@ const Header = ({ user, company }) => {
         <header className="header">
             <div className="header-left">
                 <Link to={user?.role === 'salesman' ? '/salesman-dashboard' : '/dashboard'} className="header-logo">
-                    <span className="logo-icon">🏢</span>
+                    {/* <span className="logo-icon">🏢</span> */}
                     <span className="logo-text">SalesPortal</span>
                 </Link>
             </div>
@@ -246,10 +276,16 @@ const Header = ({ user, company }) => {
 
                     {isDropdownOpen && (
                         <div className="profile-dropdown">
-                            <div className="dropdown-header">
-                                <div className="dropdown-company">
-                                    <span className="company-icon">🏢</span>
-                                    <span className="company-name">{company?.name || 'Your Company'}</span>
+                            <div className="dropdown-header flex flex-col gap-1">
+                                <div className="font-bold text-slate-800 dark:text-white">
+                                    {user?.full_name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.name || 'User'}
+                                </div>
+                                <div className="text-xs text-slate-500 mb-2">
+                                    {user?.email || user?.username}
+                                </div>
+                                <div className="dropdown-company flex items-center gap-1.5 bg-slate-50 dark:bg-slate-700/50 p-2 rounded-md border border-slate-100 dark:border-slate-600">
+                                    <span className="text-sm">🏢</span>
+                                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">{company?.name || 'Your Company'}</span>
                                 </div>
                             </div>
                             <div className="dropdown-divider"></div>
@@ -285,25 +321,139 @@ const Header = ({ user, company }) => {
             {isMobileMenuOpen && (
                 <div className="mobile-menu">
                     <div className="mobile-search">
-                        <input type="text" placeholder="Search..." />
+                        <input
+                            type="text"
+                            placeholder="Search products, salespeople..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        {searchQuery && (
+                            <div style={{ marginBottom: '12px' }}>
+                                {filteredProducts.length > 0 && (
+                                    <div style={{ marginBottom: '8px' }}>
+                                        <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', padding: '4px 0', letterSpacing: '0.5px' }}>Products</div>
+                                        {filteredProducts.slice(0, 4).map(p => (
+                                            <div key={`mp-${p.id}`}
+                                                style={{ padding: '10px 12px', borderRadius: '8px', cursor: 'pointer', transition: 'background 0.15s' }}
+                                                className="mobile-search-result"
+                                                onClick={() => { navigate('/products'); setSearchQuery(''); setIsMobileMenuOpen(false); }}
+                                            >
+                                                <div style={{ fontWeight: 500, fontSize: '14px', color: 'var(--text-primary)' }}>{p.name}</div>
+                                                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{p.category} • ₹{p.price}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                {filteredSalesmen.length > 0 && (
+                                    <div style={{ marginBottom: '8px' }}>
+                                        <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', padding: '4px 0', letterSpacing: '0.5px' }}>Salespeople</div>
+                                        {filteredSalesmen.slice(0, 4).map(s => (
+                                            <div key={`ms-${s.id}`}
+                                                style={{ padding: '10px 12px', borderRadius: '8px', cursor: 'pointer', transition: 'background 0.15s' }}
+                                                className="mobile-search-result"
+                                                onClick={() => { navigate('/salesmen'); setSearchQuery(''); setIsMobileMenuOpen(false); }}
+                                            >
+                                                <div style={{ fontWeight: 500, fontSize: '14px', color: 'var(--text-primary)' }}>{s.name || s.full_name}</div>
+                                                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{s.email}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                {filteredNavItems.length > 0 && (
+                                    <div style={{ marginBottom: '8px' }}>
+                                        <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', padding: '4px 0', letterSpacing: '0.5px' }}>Pages</div>
+                                        {filteredNavItems.map(item => (
+                                            <div key={`nav-${item.path}`}
+                                                style={{ padding: '10px 12px', borderRadius: '8px', cursor: 'pointer', transition: 'background 0.15s', display: 'flex', alignItems: 'center', gap: '10px' }}
+                                                className="mobile-search-result"
+                                                onClick={() => { navigate(item.path); setSearchQuery(''); setIsMobileMenuOpen(false); }}
+                                            >
+                                                <span style={{ fontSize: '18px' }}>{item.icon}</span>
+                                                <div style={{ fontWeight: 500, fontSize: '14px', color: 'var(--text-primary)' }}>{item.name}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                {filteredProducts.length === 0 && filteredSalesmen.length === 0 && filteredNavItems.length === 0 && (
+                                    <div style={{ padding: '12px', textAlign: 'center', fontSize: '13px', color: 'var(--text-muted)' }}>
+                                        No results for "{searchQuery}"
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
-                    <nav className="mobile-nav">
-                        <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-                            <span>📊</span> Dashboard
-                        </Link>
-                        <Link to="/products" onClick={() => setIsMobileMenuOpen(false)}>
-                            <span>📦</span> Products
-                        </Link>
-                        <Link to="/sales" onClick={() => setIsMobileMenuOpen(false)}>
-                            <span>💰</span> Sales
-                        </Link>
-                        <Link to="/salesmen" onClick={() => setIsMobileMenuOpen(false)}>
-                            <span>👥</span> Salesmen
-                        </Link>
-                        <Link to="/reports" onClick={() => setIsMobileMenuOpen(false)}>
-                            <span>📈</span> Reports
-                        </Link>
-                    </nav>
+                    {!searchQuery && (
+                        <nav className="mobile-nav">
+                            <div className="mobile-nav-section-title">Main</div>
+                            <Link to={user?.role === 'salesman' ? '/salesman-dashboard' : '/dashboard'} onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>📊</span> Dashboard
+                            </Link>
+
+                            <div className="mobile-nav-section-title">Inventory</div>
+                            <Link to="/products/list" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>📦</span> All Products
+                            </Link>
+                            <Link to="/products/add" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>➕</span> Add Product
+                            </Link>
+                            <Link to="/products/categories" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>📑</span> Categories
+                            </Link>
+
+                            <div className="mobile-nav-section-title">Sales</div>
+                            <Link to="/sales/list" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>💰</span> All Sales
+                            </Link>
+                            <Link to="/my-sales" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>🧾</span> My Sales
+                            </Link>
+                            <Link to="/sales/add" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>📝</span> Record Sale
+                            </Link>
+                            <Link to="/sales/report" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>📋</span> Sales Report
+                            </Link>
+
+                            <div className="mobile-nav-section-title">Team & Customers</div>
+                            <Link to="/salesmen/list" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>👥</span> All Salesmen
+                            </Link>
+                            <Link to="/salesmen/performance" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>🏆</span> Performance
+                            </Link>
+                            <Link to="/salesmen/leaderboard" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>🥇</span> Leaderboard
+                            </Link>
+                            <Link to="/customers/list" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>🤝</span> All Customers
+                            </Link>
+                            <Link to="/customers/add" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>➕</span> Add Customer
+                            </Link>
+
+                            <div className="mobile-nav-section-title">Insights</div>
+                            <Link to="/analytics" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>📈</span> Analytics
+                            </Link>
+                            <Link to="/ask-ai" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>🤖</span> Ask AI
+                            </Link>
+                            <Link to="/reports" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>📄</span> Reports
+                            </Link>
+
+                            <div className="mobile-nav-section-title">Account</div>
+                            <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>👤</span> My Profile
+                            </Link>
+                            <Link to="/settings" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>⚙️</span> Settings
+                            </Link>
+                            <Link to="/help" onClick={() => setIsMobileMenuOpen(false)}>
+                                <span>❓</span> Help & Support
+                            </Link>
+                        </nav>
+                    )}
                 </div>
             )}
         </header>

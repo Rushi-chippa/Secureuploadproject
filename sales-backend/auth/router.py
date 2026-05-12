@@ -249,6 +249,7 @@ def register_salesman(salesman_data: schemas.SalesmanRegisterRequest, db: Sessio
 
 from utils.email_utils import send_reset_password_email
 import secrets
+import random
 from datetime import datetime, timedelta
 
 @router.post("/forgot-password")
@@ -257,29 +258,30 @@ def forgot_password(request: schemas.ForgotPasswordRequest, db: Session = Depend
     if not user:
         # For security, don't reveal if user exists. 
         # Just say if email exists, instructions sent.
-        return {"message": "If this email is registered, instructions will be sent shortly."}
+        return {"message": "If this email is registered, an OTP will be sent shortly."}
     
-    # Generate Token
-    token = secrets.token_urlsafe(32)
-    user.reset_token = token
-    user.reset_token_expires = datetime.utcnow() + timedelta(minutes=30)
+    # Generate 6-digit OTP
+    otp = str(random.randint(100000, 999999))
+    user.reset_token = otp  # Reusing reset_token column to store OTP
+    user.reset_token_expires = datetime.utcnow() + timedelta(minutes=10)
     
     db.commit()
     
     # Send Email (currently prints to console)
-    send_reset_password_email(user.email, token)
+    from utils.email_utils import send_reset_password_email
+    send_reset_password_email(user.email, otp)
     
-    return {"message": "If this email is registered, instructions will be sent shortly."}
+    return {"message": "If this email is registered, an OTP will be sent shortly."}
 
 @router.post("/reset-password")
 def reset_password(request: schemas.ResetPasswordRequest, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(
-        models.User.reset_token == request.token,
+        models.User.reset_token == request.otp,
         models.User.reset_token_expires > datetime.utcnow()
     ).first()
     
     if not user:
-        raise HTTPException(status_code=400, detail="Invalid or expired token")
+        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
     
     # Update Password
     user.hashed_password = utils.get_password_hash(request.new_password)

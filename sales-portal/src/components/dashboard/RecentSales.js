@@ -10,7 +10,7 @@ const RecentSales = ({ sales }) => {
     }
 
     return (
-        <div className="recent-sales-table">
+        <div className="recent-sales-table overflow-x-auto">
             <table>
                 <thead>
                     <tr>

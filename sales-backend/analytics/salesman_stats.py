@@ -48,13 +48,12 @@ def get_salesman_dashboard_data(
 
     pass_end_date = None
     if month:
-        import datetime
         from calendar import monthrange
         try:
             year, m = map(int, month.split('-'))
-            start_date = datetime.datetime(year, m, 1, 0, 0, 0)
+            start_date = datetime(year, m, 1, 0, 0, 0)
             end_date_day = monthrange(year, m)[1]
-            end_date = datetime.datetime(year, m, end_date_day, 23, 59, 59)
+            end_date = datetime(year, m, end_date_day, 23, 59, 59)
             pass_end_date = end_date
             total_sales_query = total_sales_query.filter(Sale.date >= start_date, Sale.date <= end_date)
             product_dist_query = product_dist_query.filter(Sale.date >= start_date, Sale.date <= end_date)

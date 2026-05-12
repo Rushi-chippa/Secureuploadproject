@@ -55,9 +55,9 @@ const AIAssistant = () => {
 
             {/* Chat Window */}
             {isOpen && (
-                <div className="fixed bottom-6 right-6 z-50 w-96 max-w-[90vw] bg-white rounded-xl shadow-2xl flex flex-col overflow-hidden border border-gray-200" style={{ height: '500px' }}>
+                <div className="fixed bottom-6 right-6 z-50 w-96 max-w-[90vw] bg-white dark:bg-slate-800 rounded-xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 dark:border-slate-700" style={{ height: '500px' }}>
                     {/* Header */}
-                    <div className="bg-indigo-600 p-4 text-white flex justify-between items-center">
+                    <div className="bg-indigo-600 dark:bg-indigo-700 p-4 text-white flex justify-between items-center">
                         <div className="flex items-center space-x-2">
                             <ChatBubbleBottomCenterTextIcon className="h-6 w-6" />
                             <h3 className="font-semibold text-lg">Ask AI Assistant</h3>
@@ -71,7 +71,7 @@ const AIAssistant = () => {
                     </div>
 
                     {/* Messages Area */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-slate-900">
                         {messages.map((msg, index) => (
                             <div
                                 key={index}
@@ -79,8 +79,8 @@ const AIAssistant = () => {
                             >
                                 <div
                                     className={`max-w-[80%] p-3 rounded-lg text-sm ${msg.role === 'user'
-                                            ? 'bg-indigo-600 text-white rounded-br-none'
-                                            : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none shadow-sm'
+                                            ? 'bg-indigo-600 dark:bg-indigo-500 text-white rounded-br-none'
+                                            : 'bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 border border-gray-200 dark:border-slate-700 rounded-bl-none shadow-sm'
                                         }`}
                                 >
                                     {/* Simple rendering. For markdown, we'd need a library */}
@@ -90,7 +90,7 @@ const AIAssistant = () => {
                         ))}
                         {isLoading && (
                             <div className="flex justify-start">
-                                <div className="bg-white text-gray-500 p-3 rounded-lg border border-gray-200 text-sm shadow-sm">
+                                <div className="bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 p-3 rounded-lg border border-gray-200 dark:border-slate-700 text-sm shadow-sm">
                                     Thinking...
                                 </div>
                             </div>
@@ -99,14 +99,14 @@ const AIAssistant = () => {
                     </div>
 
                     {/* Input Area */}
-                    <form onSubmit={handleSendMessage} className="p-4 bg-white border-t border-gray-200">
+                    <form onSubmit={handleSendMessage} className="p-4 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700">
                         <div className="flex space-x-2">
                             <input
                                 type="text"
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 placeholder="Ask about sales, leaderboard..."
-                                className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                className="flex-1 border border-gray-300 dark:border-slate-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm dark:bg-slate-700 dark:text-slate-100 dark:placeholder-slate-400"
                                 disabled={isLoading}
                             />
                             <button

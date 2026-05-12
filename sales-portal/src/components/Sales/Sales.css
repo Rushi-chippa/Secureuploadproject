@@ -409,3 +409,14 @@
         flex-wrap: wrap;
     }
 }
+
+@media (max-width: 480px) {
+    .sales-summary,
+    .report-kpis {
+        grid-template-columns: 1fr;
+    }
+
+    .report-chart-card {
+        padding: 16px;
+    }
+}

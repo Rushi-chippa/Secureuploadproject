@@ -83,6 +83,7 @@ def read_root():
 @app.get("/api/predict-sales")
 def get_prediction(
     month: str = None,
+    product_id: int = None,
     current_user: auth_models.User = Depends(utils.get_current_active_user)
 ):
     """
@@ -105,7 +106,7 @@ def get_prediction(
             except Exception as e:
                 print(f"Invalid month forecast format: {month}")
 
-        return predictor.get_full_forecast(company_id=current_user.company_id, user_id=user_id, end_date=pass_end_date)
+        return predictor.get_full_forecast(company_id=current_user.company_id, user_id=user_id, product_id=product_id, end_date=pass_end_date)
     except Exception as e:
         print(f"Error generating prediction: {e}")
         return {
@@ -118,4 +119,6 @@ def get_prediction(
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)
+    import os
+    port = int(os.environ.get("PORT", 8001))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

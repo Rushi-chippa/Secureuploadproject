@@ -435,3 +435,13 @@
         padding: 16px;
     }
 }
+
+@media (max-width: 480px) {
+    .product-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .mini-stat-card {
+        padding: 16px;
+    }
+}

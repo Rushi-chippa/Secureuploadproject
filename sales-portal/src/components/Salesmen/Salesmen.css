@@ -74,8 +74,8 @@
 /* Grid View */
 .salesmen-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: 24px;
 }
 
 .salesman-card {
@@ -547,5 +547,15 @@
 
     .list-item-stats {
         display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-stats-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .salesman-card-stats {
+        grid-template-columns: 1fr;
     }
 }

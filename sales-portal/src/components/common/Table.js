@@ -89,7 +89,7 @@ const Table = ({
             </div>
 
             {/* Table */}
-            <div className="table-wrapper">
+            <div className="table-wrapper overflow-x-auto">
                 <table className={`table ${striped ? 'table-striped' : ''} ${hoverable ? 'table-hoverable' : ''}`}>
                     <thead>
                         <tr>
