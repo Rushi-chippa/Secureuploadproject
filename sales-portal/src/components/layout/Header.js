@@ -281,8 +281,11 @@ const Header = ({ user, company }) => {
                     {isDropdownOpen && (
                         <div className="profile-dropdown">
                             <div className="dropdown-header flex flex-col gap-1">
-                                <div className="font-bold text-slate-800 dark:text-white">
-                                    {user?.full_name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.name || 'User'}
+                                <div className="font-bold text-slate-800 dark:text-white flex items-center justify-between gap-2">
+                                    <span>{user?.full_name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.name || 'User'}</span>
+                                    <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider dark:bg-blue-900/40 dark:text-blue-300 shrink-0">
+                                        {user?.role || 'Admin'}
+                                    </span>
                                 </div>
                                 <div className="text-xs text-slate-500 mb-2">
                                     {user?.email || user?.username}
@@ -324,6 +327,31 @@ const Header = ({ user, company }) => {
 
             {isMobileMenuOpen && (
                 <div className="mobile-menu">
+                    {/* User profile card at the top of mobile navigation */}
+                    <div className="mobile-user-card flex items-center gap-3 p-3 bg-white dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-700/80 mb-1">
+                        <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-50 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0">
+                            {user?.avatar ? (
+                                <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
+                            ) : (
+                                <img
+                                    src={user?.role === 'manager'
+                                        ? '/assets/avatars/manager.svg'
+                                        : '/assets/avatars/salesman.svg'}
+                                    alt="Profile"
+                                    className="w-full h-full object-cover"
+                                />
+                            )}
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="font-bold text-sm text-slate-800 dark:text-slate-200">
+                                {user?.full_name || user?.name || 'User'}
+                            </span>
+                            <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 capitalize">
+                                💼 {user?.role || 'Admin'}
+                            </span>
+                        </div>
+                    </div>
+
                     <div className="mobile-search">
                         <input
                             type="text"
