@@ -109,8 +109,8 @@ const Contact = () => {
                         {isHelpPage ? 'Help & Support' : 'Get in Touch'}
                     </h1>
                     <p className={`${isHelpPage ? 'text-sm text-slate-500 dark:text-slate-400' : 'text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto'}`}>
-                        {isHelpPage 
-                            ? 'Submit a ticket directly to our support team or browse our contact channels.' 
+                        {isHelpPage
+                            ? 'Submit a ticket directly to our support team or browse our contact channels.'
                             : 'Have questions about our pricing, features, or need a custom solution? Our team is here to help.'}
                     </p>
                 </div>
@@ -119,7 +119,7 @@ const Contact = () => {
                     <div className={`${isHelpPage ? 'space-y-4' : 'space-y-8'}`}>
                         <div className={`bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30 ${isHelpPage ? 'p-5 rounded-2xl' : 'p-8 rounded-3xl'}`}>
                             <h2 className={`font-bold text-slate-900 dark:text-white ${isHelpPage ? 'text-lg mb-4' : 'text-2xl mb-6'}`}>Contact Information</h2>
-                            
+
                             <div className={`${isHelpPage ? 'space-y-4' : 'space-y-6'}`}>
                                 <div className="flex items-center gap-4">
                                     <div className={`bg-white dark:bg-slate-800 flex items-center justify-center text-blue-600 shadow-sm ${isHelpPage ? 'w-10 h-10 rounded-lg text-lg' : 'w-12 h-12 rounded-xl text-xl'}`}>

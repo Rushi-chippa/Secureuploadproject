@@ -36,6 +36,23 @@ const Register = () => {
         confirmPassword: '',
     });
 
+    // Checkout Modal and simulated payment gateway states
+    const [selectedPlan, setSelectedPlan] = useState('free');
+    const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState('upi'); // 'upi' or 'card'
+    const [paymentProcessing, setPaymentProcessing] = useState(false);
+    const [processingStatus, setProcessingStatus] = useState('');
+    const [paymentSuccess, setPaymentSuccess] = useState(false);
+    
+    // Card inputs for realistic validation
+    const [cardData, setCardData] = useState({
+        number: '',
+        expiry: '',
+        cvv: '',
+        name: '',
+    });
+    const [upiId, setUpiId] = useState('');
+
     const handleCompanyChange = (e) => {
         setCompanyData({ ...companyData, [e.target.name]: e.target.value });
     };
@@ -61,7 +78,7 @@ const Register = () => {
         setStep(2);
     };
 
-    const handleAdminSubmit = async (e) => {
+    const handleAdminSubmit = (e) => {
         e.preventDefault();
 
         if (adminData.password !== adminData.confirmPassword) {
@@ -74,8 +91,37 @@ const Register = () => {
             return;
         }
 
-        setLoading(true);
+        // Proceed to Step 3: Subscription Plan selection
+        setStep(3);
+    };
 
+    // Realistic Card input formatting
+    const handleCardNumberChange = (e) => {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 16) value = value.slice(0, 16);
+        const formatted = value.match(/.{1,4}/g)?.join(' ') || value;
+        setCardData({ ...cardData, number: formatted });
+    };
+
+    const handleCardExpiryChange = (e) => {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 4) value = value.slice(0, 4);
+        if (value.length > 2) {
+            setCardData({ ...cardData, expiry: `${value.slice(0, 2)}/${value.slice(2)}` });
+        } else {
+            setCardData({ ...cardData, expiry: value });
+        }
+    };
+
+    const handleCardCvvChange = (e) => {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 3) value = value.slice(0, 3);
+        setCardData({ ...cardData, cvv: value });
+    };
+
+    // Execute standard free registration directly
+    const executeRegistration = async (planType) => {
+        setLoading(true);
         const formData = new FormData();
         formData.append('company_name', companyData.companyName);
         formData.append('industry', companyData.industry);
@@ -87,17 +133,65 @@ const Register = () => {
         formData.append('full_name', adminData.name);
         formData.append('email', adminData.email);
         formData.append('password', adminData.password);
+        formData.append('plan', planType);
 
         const result = await register(formData);
 
         if (result.success) {
-            toast.success('Registration successful!');
+            toast.success('Registration successful! Welcome to SalesPortal.');
             navigate('/dashboard');
         } else {
-            toast.error(result.message);
+            toast.error(result.message || 'Registration failed');
         }
-
         setLoading(false);
+    };
+
+    // Simulated payment processing loader with state cycling
+    const startPaymentSimulation = () => {
+        setPaymentProcessing(true);
+        setProcessingStatus('Securing end-to-end connection to bank gateway...');
+        
+        setTimeout(() => {
+            setProcessingStatus('Awaiting secure bank network response code...');
+        }, 1000);
+        
+        setTimeout(() => {
+            setProcessingStatus('Payment token validated! Registering your corporate profile...');
+        }, 2000);
+        
+        setTimeout(async () => {
+            setLoading(true);
+            const formData = new FormData();
+            formData.append('company_name', companyData.companyName);
+            formData.append('industry', companyData.industry);
+            if (companyData.companySize) formData.append('company_size', companyData.companySize);
+            if (companyData.phone) formData.append('phone', companyData.phone);
+            if (companyData.address) formData.append('address', companyData.address);
+            if (logo) formData.append('logo', logo);
+
+            formData.append('full_name', adminData.name);
+            formData.append('email', adminData.email);
+            formData.append('password', adminData.password);
+            formData.append('plan', selectedPlan);
+
+            const result = await register(formData);
+            setLoading(false);
+
+            if (result.success) {
+                setProcessingStatus('Account created! Preparing dashboard...');
+                setPaymentSuccess(true);
+                setTimeout(() => {
+                    setPaymentProcessing(false);
+                    setPaymentSuccess(false);
+                    setCheckoutModalOpen(false);
+                    toast.success(selectedPlan === 'enterprise' ? 'Welcome! Enterprise account successfully activated.' : 'Welcome! Professional account successfully activated.');
+                    navigate('/dashboard');
+                }, 1800);
+            } else {
+                setPaymentProcessing(false);
+                toast.error(result.message || 'Registration failed');
+            }
+        }, 3000);
     };
 
     return (
@@ -107,7 +201,7 @@ const Register = () => {
                 <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/5 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/5 rounded-full blur-3xl"></div>
             </div>
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl relative z-10 overflow-hidden border border-gray-100 dark:border-slate-700 transition-colors duration-200">
+            <div className={`bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full ${step === 3 ? 'max-w-4xl' : 'max-w-2xl'} relative z-10 overflow-hidden border border-gray-100 dark:border-slate-700 transition-colors duration-200`}>
                 {/* Card Header with Controls */}
                 <div className="flex justify-between items-center px-6 py-4 absolute top-0 left-0 w-full z-20">
                     <Link to="/" className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all flex items-center gap-2 group">
@@ -132,14 +226,19 @@ const Register = () => {
 
                     {/* Step Indicator */}
                     <div className="flex items-center justify-center mb-8">
-                        <div className={`flex items-center ${step >= 1 ? 'text-blue-600' : 'text-slate-400'}`}>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 font-bold text-sm ${step >= 1 ? 'border-blue-600 bg-blue-50' : 'border-slate-300'}`}>1</div>
-                            <span className="ml-2 font-semibold text-sm">Company</span>
+                        <div className={`flex items-center ${step >= 1 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 font-bold text-sm ${step >= 1 ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:border-blue-400' : 'border-slate-300'}`}>1</div>
+                            <span className="ml-2 font-semibold text-xs sm:text-sm">Company</span>
                         </div>
-                        <div className={`w-16 h-0.5 mx-4 ${step >= 2 ? 'bg-blue-600' : 'bg-slate-200'}`}></div>
-                        <div className={`flex items-center ${step >= 2 ? 'text-blue-600' : 'text-slate-400'}`}>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 font-bold text-sm ${step >= 2 ? 'border-blue-600 bg-blue-50' : 'border-slate-300'}`}>2</div>
-                            <span className="ml-2 font-semibold text-sm">Admin</span>
+                        <div className={`w-8 sm:w-16 h-0.5 mx-2 sm:mx-4 ${step >= 2 ? 'bg-blue-600 dark:bg-blue-400' : 'bg-slate-200 dark:bg-slate-700'}`}></div>
+                        <div className={`flex items-center ${step >= 2 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 font-bold text-sm ${step >= 2 ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:border-blue-400' : 'border-slate-300'}`}>2</div>
+                            <span className="ml-2 font-semibold text-xs sm:text-sm">Account</span>
+                        </div>
+                        <div className={`w-8 sm:w-16 h-0.5 mx-2 sm:mx-4 ${step >= 3 ? 'bg-blue-600 dark:bg-blue-400' : 'bg-slate-200 dark:bg-slate-700'}`}></div>
+                        <div className={`flex items-center ${step >= 3 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 font-bold text-sm ${step >= 3 ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:border-blue-400' : 'border-slate-300'}`}>3</div>
+                            <span className="ml-2 font-semibold text-xs sm:text-sm">Pricing</span>
                         </div>
                     </div>
 
@@ -303,12 +402,9 @@ const Register = () => {
 
                             <button
                                 type="submit"
-                                disabled={loading}
-                                className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg shadow-blue-600/20 transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+                                className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg shadow-blue-600/20 transition-all transform active:scale-[0.98] flex justify-center items-center"
                             >
-                                {loading ? (
-                                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                                ) : 'Create Account'}
+                                Continue to Plans →
                             </button>
 
                             <button
@@ -320,6 +416,192 @@ const Register = () => {
                             </button>
                         </form>
                     )}
+
+                    {step === 3 && (
+                        <div className="space-y-6 animate-fadeIn">
+                            <div className="text-center mb-2">
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Choose Subscription Plan</h2>
+                                <p className="text-slate-500 dark:text-slate-400 text-xs">Select the best option for your corporate size</p>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                {/* Free Plan Card */}
+                                <div 
+                                    onClick={() => setSelectedPlan('free')}
+                                    className={`relative p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
+                                        selectedPlan === 'free' 
+                                            ? 'border-blue-600 bg-blue-50/30 dark:border-blue-400 dark:bg-blue-950/20 shadow-md shadow-blue-500/5' 
+                                            : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-900'
+                                    }`}
+                                >
+                                    {selectedPlan === 'free' && (
+                                        <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-sm">
+                                            ✓
+                                        </div>
+                                    )}
+                                    <div>
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Standard</div>
+                                        <h3 className="text-base font-bold text-slate-800 dark:text-white mb-2">Free Plan</h3>
+                                        <div className="text-xl font-extrabold text-slate-900 dark:text-white mb-4">
+                                            ₹0 <span className="text-xs font-normal text-slate-500">/ forever</span>
+                                        </div>
+                                        <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 mb-6">
+                                            <li className="flex items-center gap-2">
+                                                <span className="text-green-500 font-bold">✓</span> Up to 5 Salesmen
+                                            </li>
+                                            <li className="flex items-center gap-2">
+                                                <span className="text-green-500 font-bold">✓</span> 20 Products
+                                            </li>
+                                            <li className="flex items-center gap-2">
+                                                <span className="text-green-500 font-bold">✓</span> Sales Tracking
+                                            </li>
+                                            <li className="flex items-center gap-2 text-slate-400 dark:text-slate-500">
+                                                <span className="text-red-500 font-bold">❌</span> Advanced Analytics
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div className={`w-full py-2 text-center font-bold text-xs rounded-lg transition-all ${
+                                        selectedPlan === 'free'
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
+                                    }`}>
+                                        Select Free
+                                    </div>
+                                </div>
+
+                                {/* Professional Plan Card */}
+                                <div 
+                                    onClick={() => setSelectedPlan('professional')}
+                                    className={`relative p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
+                                        selectedPlan === 'professional' 
+                                            ? 'border-blue-600 bg-blue-50/30 dark:border-blue-400 dark:bg-blue-950/20 shadow-md shadow-blue-500/5' 
+                                            : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-900'
+                                    }`}
+                                >
+                                    <div className="absolute -top-3 left-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full shadow-sm z-10">
+                                        Popular
+                                    </div>
+                                    {selectedPlan === 'professional' && (
+                                        <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-sm">
+                                            ✓
+                                        </div>
+                                    )}
+                                    <div>
+                                        <div className="text-[10px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-widest mb-1">Corporate</div>
+                                        <h3 className="text-base font-bold text-slate-800 dark:text-white mb-2">Professional</h3>
+                                        <div className="text-xl font-extrabold text-slate-900 dark:text-white mb-4">
+                                            ₹999 <span className="text-xs font-normal text-slate-500">/ mo</span>
+                                        </div>
+                                        <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 mb-6">
+                                            <li className="flex items-center gap-2">
+                                                <span className="text-green-500 font-bold">✓</span> Unlimited Salesmen
+                                            </li>
+                                            <li className="flex items-center gap-2">
+                                                <span className="text-green-500 font-bold">✓</span> Unlimited Products
+                                            </li>
+                                            <li className="flex items-center gap-2">
+                                                <span className="text-green-500 font-bold">✓</span> Advanced Dashboard
+                                            </li>
+                                            <li className="flex items-center gap-2">
+                                                <span className="text-green-500 font-bold">✓</span> Export Reports
+                                            </li>
+                                            <li className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold">
+                                                <span className="text-indigo-500 dark:text-indigo-400 font-bold">✓</span> AI Sales Predictor
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div className={`w-full py-2 text-center font-bold text-xs rounded-lg transition-all ${
+                                        selectedPlan === 'professional'
+                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'
+                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
+                                    }`}>
+                                        Select Pro
+                                    </div>
+                                </div>
+
+                                {/* Enterprise Plan Card */}
+                                <div 
+                                    onClick={() => setSelectedPlan('enterprise')}
+                                    className={`relative p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
+                                        selectedPlan === 'enterprise' 
+                                            ? 'border-blue-600 bg-blue-50/30 dark:border-blue-400 dark:bg-blue-950/20 shadow-md shadow-blue-500/5' 
+                                            : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-900'
+                                    }`}
+                                >
+                                    <div className="absolute -top-3 left-6 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full shadow-sm z-10">
+                                        Ultimate
+                                    </div>
+                                    {selectedPlan === 'enterprise' && (
+                                        <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-sm">
+                                            ✓
+                                        </div>
+                                    )}
+                                    <div>
+                                        <div className="text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-1">Enterprise</div>
+                                        <h3 className="text-base font-bold text-slate-800 dark:text-white mb-2">Enterprise</h3>
+                                        <div className="text-xl font-extrabold text-slate-900 dark:text-white mb-4">
+                                            ₹2,999 <span className="text-xs font-normal text-slate-500">/ mo</span>
+                                        </div>
+                                        <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 mb-6">
+                                            <li className="flex items-center gap-2">
+                                                <span className="text-green-500 font-bold">✓</span> Unlimited Salesmen & Products
+                                            </li>
+                                            <li className="flex items-center gap-2">
+                                                <span className="text-green-500 font-bold">✓</span> Dedicated DB Server
+                                            </li>
+                                            <li className="flex items-center gap-2">
+                                                <span className="text-green-500 font-bold">✓</span> Custom branding logo
+                                            </li>
+                                            <li className="flex items-center gap-2">
+                                                <span className="text-green-500 font-bold">✓</span> 24/7 Priority VIP Support
+                                            </li>
+                                            <li className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-semibold">
+                                                <span className="text-amber-500 dark:text-amber-400 font-bold">✓</span> AI Sales Predictor (VIP)
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div className={`w-full py-2 text-center font-bold text-xs rounded-lg transition-all ${
+                                        selectedPlan === 'enterprise'
+                                            ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
+                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
+                                    }`}>
+                                        Select Enterprise
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="pt-4 space-y-3">
+                                {selectedPlan === 'free' ? (
+                                    <button
+                                        type="button"
+                                        onClick={() => executeRegistration('free')}
+                                        disabled={loading}
+                                        className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg shadow-blue-600/20 transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+                                    >
+                                        {loading ? (
+                                            <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                                        ) : 'Confirm Free Registration'}
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        onClick={() => setCheckoutModalOpen(true)}
+                                        className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-lg shadow-lg shadow-blue-600/25 transition-all transform active:scale-[0.98] flex justify-center items-center"
+                                    >
+                                        Proceed to Checkout ({selectedPlan === 'enterprise' ? '₹2999/mo' : '₹999/mo'}) →
+                                    </button>
+                                )}
+
+                                <button
+                                    type="button"
+                                    onClick={() => setStep(2)}
+                                    className="w-full py-3 px-4 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold rounded-lg transition-all"
+                                >
+                                    ← Back to Account Setup
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="bg-gray-50 dark:bg-slate-800/50 p-6 text-center border-t border-gray-100 dark:border-slate-700">
@@ -329,6 +611,211 @@ const Register = () => {
                     </p>
                 </div>
             </div>
+
+            {/* Subscription Checkout Modal */}
+            {checkoutModalOpen && (() => {
+                const upiAmount = selectedPlan === 'enterprise' ? '2999' : '999';
+                const upiPlanName = selectedPlan === 'enterprise' ? 'Enterprise Subscription' : 'Professional Subscription';
+                const upiUrl = `upi://pay?pa=salesportal@okaxis&pn=SalesPortal Inc&am=${upiAmount}&cu=INR&tn=${encodeURIComponent(upiPlanName)}`;
+                
+                return (
+                    <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
+                        <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-3xl w-full max-w-md shadow-2xl relative flex flex-col max-h-[90vh] transition-all duration-300">
+                            {/* Header */}
+                            <div className="p-5 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center shrink-0">
+                                <div>
+                                    <h3 className="text-base font-bold text-slate-900 dark:text-white">Secure checkout</h3>
+                                    <p className="text-slate-500 dark:text-slate-400 text-[10px]">SalesPortal {selectedPlan === 'enterprise' ? 'Enterprise' : 'Professional'} Tier Subscription</p>
+                                </div>
+                                <button 
+                                    onClick={() => setCheckoutModalOpen(false)}
+                                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all flex items-center justify-center font-bold text-sm"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+
+                            {/* Order Summary banner */}
+                            <div className="bg-blue-50/50 dark:bg-blue-900/10 px-5 py-3 flex justify-between items-center border-b border-slate-100 dark:border-slate-700 shrink-0">
+                                <span className="text-slate-600 dark:text-slate-300 text-xs font-medium">Monthly {selectedPlan === 'enterprise' ? 'Enterprise' : 'Professional'} Plan:</span>
+                                <span className="text-blue-600 dark:text-blue-400 font-extrabold text-sm">₹{selectedPlan === 'enterprise' ? '2999.00' : '999.00'} / month</span>
+                            </div>
+
+                            {/* Tab navigation */}
+                            <div className="flex border-b border-slate-100 dark:border-slate-700 shrink-0">
+                                <button
+                                    onClick={() => setActiveTab('upi')}
+                                    className={`flex-1 py-3 text-center font-bold text-xs border-b-2 transition-all flex items-center justify-center gap-2 ${
+                                        activeTab === 'upi'
+                                            ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+                                            : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white'
+                                    }`}
+                                >
+                                    📱 UPI QR Scanner
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('card')}
+                                    className={`flex-1 py-3 text-center font-bold text-xs border-b-2 transition-all flex items-center justify-center gap-2 ${
+                                        activeTab === 'card'
+                                            ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+                                            : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white'
+                                    }`}
+                                >
+                                    💳 Card Details
+                                </button>
+                            </div>
+
+                            {/* Modal Body */}
+                            <div className="p-5 overflow-y-auto flex-1 space-y-4 select-none scrollbar-thin dark:scrollbar-thumb-slate-700">
+                                {activeTab === 'upi' && (
+                                    <div className="space-y-4 text-center">
+                                        <div className="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+                                            Scan this QR Code with **Google Pay**, **PhonePe**, or **Paytm** on your mobile to proceed.
+                                        </div>
+                                        
+                                        {/* QR Code Container */}
+                                        <div className="inline-block p-3.5 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                                            <img 
+                                                src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiUrl)}`} 
+                                                alt="UPI Subscription QR Code Scanner"
+                                                className="w-36 h-36 mx-auto"
+                                            />
+                                        </div>
+
+                                        <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                                            Merchant: <span className="font-bold text-slate-600 dark:text-slate-300">SalesPortal Inc</span> | UPI ID: <span className="font-bold text-slate-600 dark:text-slate-300">salesportal@okaxis</span>
+                                        </div>
+
+                                        {/* Info Alert Tip banner */}
+                                        <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 p-3 rounded-xl text-left text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed flex gap-2">
+                                            <span className="text-xs">💡</span>
+                                            <span>
+                                                <strong>Demo Option C:</strong> Scanning this with GPay opens a connection but prevents actual transaction charges. Complete the checkout simulation by clicking the verify button below!
+                                            </span>
+                                        </div>
+
+                                        {/* Mock UPI ID input */}
+                                        <div className="text-left">
+                                            <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Your UPI ID (Optional)</label>
+                                            <input
+                                                type="text"
+                                                value={upiId}
+                                                onChange={(e) => setUpiId(e.target.value)}
+                                                placeholder="username@okaxis"
+                                                className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 focus:border-blue-500 transition-all outline-none text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                                            />
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            onClick={startPaymentSimulation}
+                                            className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-lg shadow-emerald-600/20 transition-all flex justify-center items-center gap-2 text-xs"
+                                        >
+                                            Verify UPI Payment & Complete
+                                        </button>
+                                    </div>
+                                )}
+
+                                {activeTab === 'card' && (
+                                    <form onSubmit={(e) => { e.preventDefault(); startPaymentSimulation(); }} className="space-y-4">
+                                        <div>
+                                            <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Cardholder Name</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={cardData.name}
+                                                onChange={(e) => setCardData({ ...cardData, name: e.target.value })}
+                                                placeholder="Enter name on card"
+                                                className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 focus:border-blue-500 transition-all outline-none text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Card Number</label>
+                                            <div className="relative">
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    value={cardData.number}
+                                                    onChange={handleCardNumberChange}
+                                                    placeholder="0000 0000 0000 0000"
+                                                    className="w-full px-3 py-2 pr-10 rounded-lg border border-slate-200 dark:border-slate-600 focus:border-blue-500 transition-all outline-none text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                                                />
+                                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs">💳</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Expiration Date</label>
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    value={cardData.expiry}
+                                                    onChange={handleCardExpiryChange}
+                                                    placeholder="MM/YY"
+                                                    className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 focus:border-blue-500 transition-all outline-none text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-1">CVV</label>
+                                                <input
+                                                    type="password"
+                                                    required
+                                                    value={cardData.cvv}
+                                                    onChange={handleCardCvvChange}
+                                                    placeholder="•••"
+                                                    className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 focus:border-blue-500 transition-all outline-none text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            type="submit"
+                                            className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg shadow-blue-600/20 transition-all flex justify-center items-center gap-2 text-xs mt-4"
+                                        >
+                                            Pay ₹{selectedPlan === 'enterprise' ? '2999.00' : '999.00'} & Complete Registration
+                                        </button>
+                                    </form>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                );
+            })()}
+
+            {/* Full-Screen Payment Processing Overlay */}
+            {paymentProcessing && (
+                <div className="fixed inset-0 bg-slate-900/90 dark:bg-slate-950/95 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+                    <div className="max-w-md w-full text-center space-y-6">
+                        {!paymentSuccess ? (
+                            <>
+                                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full border-4 border-t-blue-500 border-r-indigo-500 border-b-transparent border-l-transparent animate-spin mb-4">
+                                    <div className="w-12 h-12 rounded-full border-4 border-r-blue-400 border-t-transparent border-b-transparent border-l-transparent animate-spin reverse"></div>
+                                </div>
+                                <h3 className="text-xl font-bold text-white tracking-wide">Processing Secure Transaction</h3>
+                                <p className="text-slate-400 text-sm font-medium animate-fadeIn min-h-[40px] px-6">
+                                    {processingStatus}
+                                </p>
+                                <div className="w-48 h-1 bg-slate-800 rounded-full mx-auto overflow-hidden">
+                                    <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full animate-progress animate-infinite" style={{ width: '40%' }}></div>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="space-y-4 animate-scaleUp">
+                                <div className="w-20 h-20 rounded-full bg-emerald-500/20 border-4 border-emerald-500 flex items-center justify-center mx-auto mb-4 text-emerald-500 animate-bounce">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-2xl font-bold text-white">Payment Authorized!</h3>
+                                <p className="text-emerald-400 text-sm font-semibold">Your Professional Subscription is now active.</p>
+                                <p className="text-slate-400 text-xs mt-1">Dispatching real invoice receipt to your inbox...</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
