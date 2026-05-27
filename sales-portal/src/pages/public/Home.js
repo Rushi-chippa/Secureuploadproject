@@ -267,8 +267,8 @@ const Home = () => {
                                                                 {/* Colored Fill */}
                                                                 <div
                                                                     className={`absolute bottom-0 w-full rounded-t-md transition-all duration-500 ${item.highlight
-                                                                            ? 'bg-gradient-to-t from-blue-600 to-indigo-500 shadow-lg shadow-blue-500/20'
-                                                                            : 'bg-blue-500/80 group-hover:bg-blue-500'
+                                                                        ? 'bg-gradient-to-t from-blue-600 to-indigo-500 shadow-lg shadow-blue-500/20'
+                                                                        : 'bg-blue-500/80 group-hover:bg-blue-500'
                                                                         }`}
                                                                     style={{ height: `${item.h}%` }}
                                                                 ></div>
@@ -370,8 +370,8 @@ const Home = () => {
                         <div className="grid md:grid-cols-3 gap-8">
                             {[
                                 { text: "SalesPortal transformed how we manage our sales team. Revenue increased by 35% in just 3 months!", author: "Gautam Nalla", role: "Manager, AB Water Bottles.", avatar: "👨‍💼" },
-                                { text: "The analytics dashboard is incredible. We can finally see which products perform best and who our top sellers are.", author: "Sarah Mitchell", role: "Sales Director, GreenLeaf", avatar: "👩‍💼" },
-                                { text: "Easy to set up, intuitive to use. Our entire team was onboarded within a day. Highly recommend!", author: "Mike Chen", role: "Operations Head, RetailMax", avatar: "👨‍💻" }
+                                { text: "Tracking my sales and targets has never been this easy! I can record my transactions on the go and check my commissions instantly.", author: "Tejas Tolnure", role: "Salesmen", avatar: "👨‍💼" },
+                                { text: "The sales leaderboard and performance rankings have created a really healthy competition in our team. Our overall productivity has boosted by 40%!", author: "Bhavesh Zalke", role: "Manager, AgroField", avatar: "👨‍💼" }
                             ].map((t, idx) => (
                                 <div key={idx} className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
                                     <div className="flex text-yellow-400 mb-4">⭐⭐⭐⭐⭐</div>
