@@ -217,21 +217,70 @@ const Home = () => {
                                         <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-6 relative">
                                             <div className="flex justify-between items-center mb-6">
                                                 <h4 className="font-bold text-slate-800">Sales Analytics</h4>
-                                                <div className="flex gap-2">
-                                                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                                                    <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
+                                                <div className="flex items-center gap-4 text-[11px] font-semibold text-slate-500">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <div className="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+                                                        <span>Revenue</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <div className="w-2.5 h-2.5 rounded-full bg-indigo-400"></div>
+                                                        <span>Forecast</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            {/* Mock Chart Visualization */}
-                                            <div className="flex items-end gap-3 h-32 px-2">
-                                                {[45, 65, 50, 75, 60, 85, 95, 80, 70, 90, 100, 85].map((h, i) => (
-                                                    <div key={i} className="flex-1 bg-blue-50 rounded-t-lg relative group overflow-hidden">
-                                                        <div
-                                                            className="absolute bottom-0 w-full bg-blue-500/90 rounded-t-lg transition-all duration-1000 group-hover:bg-blue-600"
-                                                            style={{ height: `${h}%` }}
-                                                        ></div>
-                                                    </div>
-                                                ))}
+                                            
+                                            {/* Mock Chart with Grid Lines and Labels */}
+                                            <div className="relative h-44 flex items-end pl-8 pr-2">
+                                                {/* Y-Axis Labels */}
+                                                <div className="absolute left-0 top-0 bottom-6 flex flex-col justify-between text-[10px] font-bold text-slate-400 w-6 pr-2 border-r border-slate-100/80">
+                                                    <span>100%</span>
+                                                    <span>75%</span>
+                                                    <span>50%</span>
+                                                    <span>25%</span>
+                                                    <span>0%</span>
+                                                </div>
+
+                                                {/* Horizontal Grid Lines */}
+                                                <div className="absolute left-8 right-2 top-0 bottom-6 flex flex-col justify-between pointer-events-none">
+                                                    <div className="w-full border-t border-slate-100/60"></div>
+                                                    <div className="w-full border-t border-slate-100/60"></div>
+                                                    <div className="w-full border-t border-slate-100/60"></div>
+                                                    <div className="w-full border-t border-slate-100/60"></div>
+                                                    <div className="w-full border-t border-slate-100/60"></div>
+                                                </div>
+
+                                                {/* Columns */}
+                                                <div className="w-full h-full flex items-end gap-2 relative z-10 pb-6">
+                                                    {[
+                                                        { h: 45, m: 'Jan' }, { h: 65, m: 'Feb' }, { h: 50, m: 'Mar' }, 
+                                                        { h: 75, m: 'Apr' }, { h: 60, m: 'May' }, { h: 85, m: 'Jun' }, 
+                                                        { h: 95, m: 'Jul', highlight: true }, { h: 80, m: 'Aug' }, { h: 70, m: 'Sep' }, 
+                                                        { h: 90, m: 'Oct' }, { h: 75, m: 'Nov' }, { h: 85, m: 'Dec' }
+                                                    ].map((item, i) => (
+                                                        <div key={i} className="flex-1 h-full flex flex-col justify-end items-center relative group">
+                                                            {/* Tooltip on Hover */}
+                                                            <div className="absolute bottom-full mb-2 bg-slate-900 text-white text-[10px] font-bold py-1 px-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap shadow-lg translate-y-1 group-hover:translate-y-0 z-20">
+                                                                ₹{(item.h * 1000).toLocaleString()} ({item.m})
+                                                            </div>
+                                                            {/* Bar Background Track */}
+                                                            <div className="w-full h-full bg-slate-50 dark:bg-slate-900/10 rounded-t-md relative overflow-hidden">
+                                                                {/* Colored Fill */}
+                                                                <div
+                                                                    className={`absolute bottom-0 w-full rounded-t-md transition-all duration-500 ${
+                                                                        item.highlight 
+                                                                            ? 'bg-gradient-to-t from-blue-600 to-indigo-500 shadow-lg shadow-blue-500/20' 
+                                                                            : 'bg-blue-500/80 group-hover:bg-blue-500'
+                                                                    }`}
+                                                                    style={{ height: `${item.h}%` }}
+                                                                ></div>
+                                                            </div>
+                                                            {/* Month Label */}
+                                                            <span className="absolute top-full mt-2 text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                                                                {item.m}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
