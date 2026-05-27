@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import ThemeToggle from '../../components/common/ThemeToggle';
 
 const Register = () => {
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(0);
     const [loading, setLoading] = useState(false);
     const { register, user } = useAuth();
     const navigate = useNavigate();
@@ -204,43 +204,121 @@ const Register = () => {
             <div className={`bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full ${step === 3 ? 'max-w-4xl' : 'max-w-2xl'} relative z-10 overflow-hidden border border-gray-100 dark:border-slate-700 transition-colors duration-200`}>
                 {/* Card Header with Controls */}
                 <div className="flex justify-between items-center px-6 py-4 absolute top-0 left-0 w-full z-20">
-                    <Link to="/" className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all flex items-center gap-2 group">
-                        <div className="w-8 h-8 rounded-md border border-slate-200 dark:border-slate-600 flex items-center justify-center bg-white dark:bg-slate-800 shadow-sm group-hover:shadow-md transition-all">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M19 12H5M12 19l-7-7 7-7" />
-                            </svg>
-                        </div>
-                        <span className="text-sm font-medium hidden sm:inline-block">Back</span>
-                    </Link>
+                    {step === 0 ? (
+                        <Link to="/login" className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all flex items-center gap-2 group">
+                            <div className="w-8 h-8 rounded-md border border-slate-200 dark:border-slate-600 flex items-center justify-center bg-white dark:bg-slate-800 shadow-sm group-hover:shadow-md transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                                </svg>
+                            </div>
+                            <span className="text-sm font-medium hidden sm:inline-block">Back</span>
+                        </Link>
+                    ) : (
+                        <button 
+                            type="button"
+                            onClick={() => setStep(step - 1)} 
+                            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all flex items-center gap-2 group"
+                        >
+                            <div className="w-8 h-8 rounded-md border border-slate-200 dark:border-slate-600 flex items-center justify-center bg-white dark:bg-slate-800 shadow-sm group-hover:shadow-md transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                                </svg>
+                            </div>
+                            <span className="text-sm font-medium hidden sm:inline-block">Back</span>
+                        </button>
+                    )}
                     <ThemeToggle />
                 </div>
 
                 <div className="p-8 sm:p-10 pt-20">
                     <div className="text-center mb-8">
                         <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-50 dark:bg-blue-900/30 rounded-xl mb-4 text-2xl">
-                            🏢
+                            {step === 0 ? "🚀" : "🏢"}
                         </div>
-                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Create Account</h1>
-                        <p className="text-slate-500 text-sm">Join SalesPortal and manage your sales team</p>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                            {step === 0 ? "Get Started" : "Create Account"}
+                        </h1>
+                        <p className="text-slate-500 text-sm">
+                            {step === 0 ? "Join SalesPortal to streamline operations and boost sales" : "Join SalesPortal and manage your sales team"}
+                        </p>
                     </div>
 
                     {/* Step Indicator */}
-                    <div className="flex items-center justify-center mb-8">
-                        <div className={`flex items-center ${step >= 1 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 font-bold text-sm ${step >= 1 ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:border-blue-400' : 'border-slate-300'}`}>1</div>
-                            <span className="ml-2 font-semibold text-xs sm:text-sm">Company</span>
+                    {step > 0 && (
+                        <div className="flex items-center justify-center mb-8">
+                            <div className={`flex items-center ${step >= 1 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 font-bold text-sm ${step >= 1 ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:border-blue-400' : 'border-slate-300'}`}>1</div>
+                                <span className="ml-2 font-semibold text-xs sm:text-sm">Company</span>
+                            </div>
+                            <div className={`w-8 sm:w-16 h-0.5 mx-2 sm:mx-4 ${step >= 2 ? 'bg-blue-600 dark:bg-blue-400' : 'bg-slate-200 dark:bg-slate-700'}`}></div>
+                            <div className={`flex items-center ${step >= 2 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 font-bold text-sm ${step >= 2 ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:border-blue-400' : 'border-slate-300'}`}>2</div>
+                                <span className="ml-2 font-semibold text-xs sm:text-sm">Account</span>
+                            </div>
+                            <div className={`w-8 sm:w-16 h-0.5 mx-2 sm:mx-4 ${step >= 3 ? 'bg-blue-600 dark:bg-blue-400' : 'bg-slate-200 dark:bg-slate-700'}`}></div>
+                            <div className={`flex items-center ${step >= 3 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 font-bold text-sm ${step >= 3 ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:border-blue-400' : 'border-slate-300'}`}>3</div>
+                                <span className="ml-2 font-semibold text-xs sm:text-sm">Pricing</span>
+                            </div>
                         </div>
-                        <div className={`w-8 sm:w-16 h-0.5 mx-2 sm:mx-4 ${step >= 2 ? 'bg-blue-600 dark:bg-blue-400' : 'bg-slate-200 dark:bg-slate-700'}`}></div>
-                        <div className={`flex items-center ${step >= 2 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 font-bold text-sm ${step >= 2 ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:border-blue-400' : 'border-slate-300'}`}>2</div>
-                            <span className="ml-2 font-semibold text-xs sm:text-sm">Account</span>
+                    )}
+
+                    {step === 0 && (
+                        <div className="space-y-8 animate-fadeIn text-center">
+                            <div className="mb-4">
+                                <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2">
+                                    Choose Your Account Type
+                                </h2>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm max-w-md mx-auto">
+                                    To get started, please select how you will be using SalesPortal.
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-xl mx-auto">
+                                {/* Option 1: Manager */}
+                                <div
+                                    onClick={() => setStep(1)}
+                                    className="group relative bg-white dark:bg-slate-900 p-6 rounded-2xl border-2 border-slate-200 dark:border-slate-700 hover:border-blue-600 dark:hover:border-blue-400 cursor-pointer shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+                                >
+                                    <div className="flex flex-col items-center">
+                                        <div className="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition-all">
+                                            🏢
+                                        </div>
+                                        <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                            Company Manager
+                                        </h3>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                            Register a new company workspace, invite your team, add products, and view company analytics.
+                                        </p>
+                                    </div>
+                                    <div className="mt-6 w-full py-2.5 px-4 bg-slate-50 dark:bg-slate-800/80 group-hover:bg-blue-600 text-slate-700 dark:text-slate-300 group-hover:text-white font-bold text-xs rounded-xl shadow-sm group-hover:shadow-md group-hover:shadow-blue-500/20 transition-all duration-300">
+                                        Create Workspace →
+                                    </div>
+                                </div>
+
+                                {/* Option 2: Salesman */}
+                                <div
+                                    onClick={() => navigate('/register-salesman')}
+                                    className="group relative bg-white dark:bg-slate-900 p-6 rounded-2xl border-2 border-slate-200 dark:border-slate-700 hover:border-indigo-600 dark:hover:border-indigo-400 cursor-pointer shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+                                >
+                                    <div className="flex flex-col items-center">
+                                        <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 transition-all">
+                                            💼
+                                        </div>
+                                        <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                            Sales Representative
+                                        </h3>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                            Join your company's existing workspace. Search your team, submit sales, and track your performance.
+                                        </p>
+                                    </div>
+                                    <div className="mt-6 w-full py-2.5 px-4 bg-slate-50 dark:bg-slate-800/80 group-hover:bg-indigo-600 text-slate-700 dark:text-slate-300 group-hover:text-white font-bold text-xs rounded-xl shadow-sm group-hover:shadow-md group-hover:shadow-indigo-500/20 transition-all duration-300">
+                                        Join Company →
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className={`w-8 sm:w-16 h-0.5 mx-2 sm:mx-4 ${step >= 3 ? 'bg-blue-600 dark:bg-blue-400' : 'bg-slate-200 dark:bg-slate-700'}`}></div>
-                        <div className={`flex items-center ${step >= 3 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 font-bold text-sm ${step >= 3 ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:border-blue-400' : 'border-slate-300'}`}>3</div>
-                            <span className="ml-2 font-semibold text-xs sm:text-sm">Pricing</span>
-                        </div>
-                    </div>
+                    )}
 
                     {step === 1 && (
                         <form onSubmit={handleCompanySubmit} className="space-y-6 animate-fadeIn">

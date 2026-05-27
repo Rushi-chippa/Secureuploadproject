@@ -48,6 +48,7 @@ def register(
     address: str = Form(None),
     company_size: str = Form(None),
     logo: UploadFile = File(None),
+    plan: str = Form("free"),
     db: Session = Depends(get_db)
 ):
     try:
@@ -88,7 +89,8 @@ def register(
             phone=phone,
             address=address,
             company_size=company_size,
-            logo_url=logo_url
+            logo_url=logo_url,
+            subscription_plan=plan
         )
         db.add(new_company)
         db.commit()
@@ -106,6 +108,36 @@ def register(
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
+        
+        # Send subscription confirmation & welcome invoice email
+        try:
+            from utils.email_utils import send_welcome_invoice_email
+            if plan == "enterprise":
+                plan_name = "Enterprise Plan"
+                amount_str = "₹2,999.00/mo"
+            elif plan == "professional":
+                plan_name = "Professional Plan"
+                amount_str = "₹999.00/mo"
+            else:
+                plan_name = "Free Plan"
+                amount_str = "₹0.00 (Forever Free)"
+                
+            send_welcome_invoice_email(
+                email=new_user.email,
+                full_name=new_user.full_name,
+                company_name=new_company.name,
+                plan_name=plan_name,
+                amount=amount_str
+            )
+        except Exception as email_err:
+            print(f"ERROR sending welcome email invoice: {email_err}")
+
+        # Simulate SMS text notification
+        print("\n" + "="*60)
+        print(f"📱 [SIMULATED SMS to {phone or 'N/A'}]")
+        print(f"Congratulations {full_name}! Your company '{company_name}' has successfully registered on the '{plan.upper()}' plan.")
+        print(f"A welcome email with your active receipt/invoice has been dispatched to {email}.")
+        print("="*60 + "\n")
         
         # Dynamic table creation removed. Salesmen reuse Users table.
 
