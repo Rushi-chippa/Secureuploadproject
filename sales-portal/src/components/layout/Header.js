@@ -239,7 +239,11 @@ const Header = ({ user, company }) => {
                 </div>
 
                 <div className="header-help">
-                    <button className="help-btn">
+                    <button 
+                        className="help-btn"
+                        onClick={() => navigate('/help')}
+                        title="Help & Support"
+                    >
                         <span>❓</span>
                     </button>
                 </div>

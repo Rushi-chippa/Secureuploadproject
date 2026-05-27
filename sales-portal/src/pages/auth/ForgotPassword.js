@@ -18,7 +18,7 @@ const ForgotPassword = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:8001/auth/forgot-password', { email });
+            const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8001'}/auth/forgot-password`, { email });
             toast.success(response.data.message);
             setStep(2);
         } catch (error) {
@@ -31,7 +31,7 @@ const ForgotPassword = () => {
 
     const handleResetPassword = async (e) => {
         e.preventDefault();
-        
+
         if (newPassword.length < 6) {
             toast.error("Password must be at least 6 characters long.");
             return;
@@ -40,9 +40,9 @@ const ForgotPassword = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:8001/auth/reset-password', { 
+            const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8001'}/auth/reset-password`, {
                 otp: otp,
-                new_password: newPassword 
+                new_password: newPassword
             });
             toast.success("Password resetted successfully! Please login with your new password.");
             setTimeout(() => {
@@ -98,7 +98,7 @@ const ForgotPassword = () => {
                                             type="email"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
-                                            placeholder="name@company.com"
+                                            placeholder="Enter your registered email"
                                             required
                                             className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-gray-50 dark:bg-slate-900"
                                         />
@@ -172,13 +172,13 @@ const ForgotPassword = () => {
                                 </button>
 
                                 <div className="text-center mt-4">
-                                     <button 
-                                        type="button" 
-                                        onClick={() => setStep(1)} 
+                                    <button
+                                        type="button"
+                                        onClick={() => setStep(1)}
                                         className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
-                                     >
+                                    >
                                         Didn't receive code? Resend
-                                     </button>
+                                    </button>
                                 </div>
                             </form>
                         </>

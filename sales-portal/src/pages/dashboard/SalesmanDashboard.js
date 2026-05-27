@@ -59,7 +59,7 @@ const SalesmanDashboard = () => {
         setIsLoadingStats(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:8001/api/analytics/salesman/dashboard/?month=${selectedMonth}`, {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8001'}/api/analytics/salesman/dashboard/?month=${selectedMonth}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

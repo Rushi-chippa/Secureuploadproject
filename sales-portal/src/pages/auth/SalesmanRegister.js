@@ -157,7 +157,7 @@ const SalesmanRegister = () => {
 
                                                     <div className="w-24 h-24 rounded-2xl bg-white dark:bg-slate-700 p-2 mb-6 shadow-lg shadow-slate-100 dark:shadow-none group-hover:shadow-blue-200 dark:group-hover:shadow-blue-900/20 transition-all duration-300 transform group-hover:scale-110 flex items-center justify-center">
                                                         {company.logo_url ? (
-                                                            <img src={`http://localhost:8001${company.logo_url}`} alt={company.name} className="w-full h-full object-contain rounded-xl" />
+                                                            <img src={`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8001'}${company.logo_url}`} alt={company.name} className="w-full h-full object-contain rounded-xl" />
                                                         ) : (
                                                             <span className="text-5xl filter grayscale group-hover:grayscale-0 transition-all">🏢</span>
                                                         )}
@@ -197,7 +197,7 @@ const SalesmanRegister = () => {
                                 <div className="text-center mb-8">
                                     <div className="w-20 h-20 mx-auto bg-white dark:bg-slate-800 rounded-2xl shadow-xl flex items-center justify-center p-2 mb-4 border border-slate-100 dark:border-slate-700">
                                         {selectedCompany.logo_url ? (
-                                            <img src={`http://localhost:8001${selectedCompany.logo_url}`} alt={selectedCompany.name} className="w-full h-full object-contain rounded-xl" />
+                                            <img src={`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8001'}${selectedCompany.logo_url}`} alt={selectedCompany.name} className="w-full h-full object-contain rounded-xl" />
                                         ) : (
                                             <span className="text-4xl">🏢</span>
                                         )}

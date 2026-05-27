@@ -114,8 +114,88 @@ def get_prediction(
             'forecast': [],
             'summary': {'message': f"Error generating prediction: {str(e)}"}
         }
-    
 
+from pydantic import BaseModel
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+class ContactRequest(BaseModel):
+    name: str
+    email: str
+    message: str
+
+@app.post("/api/contact")
+def submit_contact_form(payload: ContactRequest):
+    """
+    Relays support messages from the help form directly to EMAIL_USER (Gmail) using Gmail SMTP.
+    """
+    EMAIL_USER = os.getenv("EMAIL_USER")
+    EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+    
+    print("\n" + "="*50)
+    print(f"DEBUG: Processing contact form submission from: {payload.name} ({payload.email})")
+    print("="*50 + "\n")
+
+    if not EMAIL_USER or not EMAIL_PASSWORD:
+        print("ERROR: EMAIL_USER or EMAIL_PASSWORD not found in environment variables.")
+        return {"success": False, "message": "Email server not configured"}
+
+    try:
+        # Create message to support team (delivered to EMAIL_USER)
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = f"SalesPortal: New Support Ticket from {payload.name}"
+        msg['From'] = f"SalesPortal Support <{EMAIL_USER}>"
+        msg['To'] = EMAIL_USER
+        msg['Reply-To'] = payload.email # Allows direct reply to the sender
+
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                .card {{ font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; }}
+                .field {{ margin-bottom: 15px; }}
+                .label {{ font-weight: bold; color: #475569; }}
+                .value {{ color: #0f172a; margin-top: 5px; }}
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <h2>New Support Ticket</h2>
+                <div class="field">
+                    <div class="label">Sender Name:</div>
+                    <div class="value">{payload.name}</div>
+                </div>
+                <div class="field">
+                    <div class="label">Sender Email:</div>
+                    <div class="value">{payload.email}</div>
+                </div>
+                <div class="field">
+                    <div class="label">Message:</div>
+                    <div class="value" style="white-space: pre-wrap; background: #f8fafc; padding: 15px; border-radius: 6px;">{payload.message}</div>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        part = MIMEText(html_content, 'html')
+        msg.attach(part)
+
+        # Connect to Gmail SMTP
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(EMAIL_USER, EMAIL_PASSWORD)
+        server.sendmail(EMAIL_USER, EMAIL_USER, msg.as_string())
+        server.quit()
+        
+        print(f"SUCCESS: Contact form email sent successfully to {EMAIL_USER}")
+        return {"success": True, "message": "Message sent successfully!"}
+        
+    except Exception as e:
+        print(f"CRITICAL ERROR sending contact email: {str(e)}")
+        return {"success": False, "message": str(e)}
 
 
 if __name__ == "__main__":
