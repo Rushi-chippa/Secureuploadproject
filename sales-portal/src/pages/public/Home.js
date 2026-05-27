@@ -370,7 +370,7 @@ const Home = () => {
                         <div className="grid md:grid-cols-3 gap-8">
                             {[
                                 { text: "SalesPortal transformed how we manage our sales team. Revenue increased by 35% in just 3 months!", author: "Gautam Nalla", role: "Manager, AB Water Bottles.", avatar: "👨‍💼" },
-                                { text: "Tracking my sales and targets has never been this easy! I can record my transactions on the go and check my commissions instantly.", author: "Tejas Tolnure", role: "Salesmen", avatar: "👨‍💼" },
+                                { text: "Tracking my sales and targets has never been this easy! I can record my transactions on the go and check my commissions instantly.", author: "Tejas Tolnure", role: "Salesmen , AB Water Bottles", avatar: "👨‍💼" },
                                 { text: "The sales leaderboard and performance rankings have created a really healthy competition in our team. Our overall productivity has boosted by 40%!", author: "Bhavesh Zalke", role: "Manager, AgroField", avatar: "👨‍💼" }
                             ].map((t, idx) => (
                                 <div key={idx} className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
