@@ -228,7 +228,7 @@ const Home = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            
+
                                             {/* Mock Chart with Grid Lines and Labels */}
                                             <div className="relative h-44 flex items-end pl-8 pr-2">
                                                 {/* Y-Axis Labels */}
@@ -252,9 +252,9 @@ const Home = () => {
                                                 {/* Columns */}
                                                 <div className="w-full h-full flex items-end gap-2 relative z-10 pb-6">
                                                     {[
-                                                        { h: 45, m: 'Jan' }, { h: 65, m: 'Feb' }, { h: 50, m: 'Mar' }, 
-                                                        { h: 75, m: 'Apr' }, { h: 60, m: 'May' }, { h: 85, m: 'Jun' }, 
-                                                        { h: 95, m: 'Jul', highlight: true }, { h: 80, m: 'Aug' }, { h: 70, m: 'Sep' }, 
+                                                        { h: 45, m: 'Jan' }, { h: 65, m: 'Feb' }, { h: 50, m: 'Mar' },
+                                                        { h: 75, m: 'Apr' }, { h: 60, m: 'May' }, { h: 85, m: 'Jun' },
+                                                        { h: 95, m: 'Jul', highlight: true }, { h: 80, m: 'Aug' }, { h: 70, m: 'Sep' },
                                                         { h: 90, m: 'Oct' }, { h: 75, m: 'Nov' }, { h: 85, m: 'Dec' }
                                                     ].map((item, i) => (
                                                         <div key={i} className="flex-1 h-full flex flex-col justify-end items-center relative group">
@@ -266,11 +266,10 @@ const Home = () => {
                                                             <div className="w-full h-full bg-slate-50 dark:bg-slate-900/10 rounded-t-md relative overflow-hidden">
                                                                 {/* Colored Fill */}
                                                                 <div
-                                                                    className={`absolute bottom-0 w-full rounded-t-md transition-all duration-500 ${
-                                                                        item.highlight 
-                                                                            ? 'bg-gradient-to-t from-blue-600 to-indigo-500 shadow-lg shadow-blue-500/20' 
+                                                                    className={`absolute bottom-0 w-full rounded-t-md transition-all duration-500 ${item.highlight
+                                                                            ? 'bg-gradient-to-t from-blue-600 to-indigo-500 shadow-lg shadow-blue-500/20'
                                                                             : 'bg-blue-500/80 group-hover:bg-blue-500'
-                                                                    }`}
+                                                                        }`}
                                                                     style={{ height: `${item.h}%` }}
                                                                 ></div>
                                                             </div>
@@ -419,7 +418,7 @@ const Home = () => {
                             <div className="bg-white dark:bg-slate-800 p-8 rounded-2xl border-2 border-blue-600 relative shadow-xl shadow-blue-600/10 transform md:-translate-y-4 transition-colors duration-200">
                                 <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">POPULAR</div>
                                 <div className="text-sm font-bold text-blue-600 uppercase tracking-wide mb-2">Professional</div>
-                                <div className="text-4xl font-extrabold text-slate-900 dark:text-white mb-2">$29<span className="text-lg font-normal text-slate-500 dark:text-slate-400">/mo</span></div>
+                                <div className="text-4xl font-extrabold text-slate-900 dark:text-white mb-2">₹999<span className="text-lg font-normal text-slate-500 dark:text-slate-400">/mo</span></div>
                                 <div className="text-slate-500 dark:text-slate-400 mb-6">Per Company</div>
                                 <ul className="space-y-4 text-left text-sm text-slate-600 dark:text-slate-300 mb-8 border-t border-gray-100 dark:border-slate-700 pt-6">
                                     <li className="flex gap-3">✅ Unlimited Salesmen</li>
@@ -435,7 +434,7 @@ const Home = () => {
                             {/* Enterprise */}
                             <div className="bg-white dark:bg-slate-800 p-8 rounded-2xl border border-gray-200 dark:border-slate-700 transition-colors duration-200">
                                 <div className="text-sm font-bold text-blue-600 uppercase tracking-wide mb-2">Enterprise</div>
-                                <div className="text-4xl font-extrabold text-slate-900 dark:text-white mb-2">$99<span className="text-lg font-normal text-slate-500 dark:text-slate-400">/mo</span></div>
+                                <div className="text-4xl font-extrabold text-slate-900 dark:text-white mb-2">₹2999<span className="text-lg font-normal text-slate-500 dark:text-slate-400">/mo</span></div>
                                 <div className="text-slate-500 dark:text-slate-400 mb-6">Per Company</div>
                                 <ul className="space-y-4 text-left text-sm text-slate-600 dark:text-slate-300 mb-8 border-t border-gray-100 dark:border-slate-700 pt-6">
                                     <li className="flex gap-3">✅ Everything in Pro</li>
