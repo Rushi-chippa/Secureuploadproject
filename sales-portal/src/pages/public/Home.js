@@ -102,7 +102,7 @@ const Home = () => {
                             {/* <span className="text-2xl">🏢</span> */}
                             <span className="font-bold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white">SalesPortal</span>
                         </div>
-                        <nav className="flex items-center gap-2 sm:gap-4">
+                        {/* <nav className="flex items-center gap-2 sm:gap-4">
                             <ThemeToggle />
                             <Link to="/register-salesman" className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                                 Companies
@@ -113,7 +113,170 @@ const Home = () => {
                             <Link to="/register" className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20">
                                 Get Started
                             </Link>
-                        </nav>
+                        </nav> */}
+
+
+
+
+<nav className="flex items-center gap-2 sm:gap-3 md:gap-4">
+    <ThemeToggle />
+
+    <Link
+        to="/register-salesman"
+        className="
+        px-2 sm:px-4
+        py-1.5 sm:py-2
+        rounded-lg sm:rounded-xl
+        bg-white hover:bg-slate-100
+        text-slate-600 hover:text-blue-600
+        border border-slate-200
+        text-[10px] xs:text-xs sm:text-sm
+        font-medium
+        shadow-md hover:shadow-lg
+        transition-all duration-300
+        whitespace-nowrap
+        "
+    >
+        Companies
+    </Link>
+
+    <Link
+        to="/login"
+        className="
+        px-2 sm:px-4
+        py-1.5 sm:py-2
+        rounded-lg sm:rounded-xl
+        bg-white hover:bg-slate-100
+        text-slate-600 hover:text-blue-600
+        border border-slate-200
+        text-[10px] xs:text-xs sm:text-sm
+        font-medium
+        shadow-md hover:shadow-lg
+        transition-all duration-300
+        whitespace-nowrap
+        "
+    >
+        Sign In
+    </Link>
+
+    <Link
+        to="/get-started"
+        className="
+        px-3 sm:px-5
+        py-1.5 sm:py-2
+        rounded-lg sm:rounded-xl
+        bg-blue-600 hover:bg-blue-700
+        text-white
+        text-[10px] xs:text-xs sm:text-sm
+        font-semibold
+        shadow-md hover:shadow-xl
+        transition-all duration-300
+        whitespace-nowrap
+        "
+    >
+        Get Started
+    </Link>
+</nav>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{/* with while buttons*/}
+{/* 
+<nav className="flex items-center gap-2 sm:gap-4">
+    <ThemeToggle />
+
+    <Link
+        to="/register-salesman"
+        className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 
+        bg-white/80 dark:bg-slate-800/80 
+        text-xs sm:text-sm font-medium 
+        text-slate-700 dark:text-slate-200 
+        hover:bg-blue-50 dark:hover:bg-slate-700 
+        hover:text-blue-600 dark:hover:text-blue-400
+        shadow-sm transition-all duration-300"
+    >
+        Companies
+    </Link>
+
+    <Link
+        to="/login"
+        className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 
+        bg-white/80 dark:bg-slate-800/80 
+        text-xs sm:text-sm font-medium 
+        text-slate-700 dark:text-slate-200 
+        hover:bg-blue-50 dark:hover:bg-slate-700 
+        hover:text-blue-600 dark:hover:text-blue-400
+        shadow-sm transition-all duration-300"
+    >
+        Sign In
+    </Link>
+
+    <Link
+        to="/get-started"
+        className="px-5 py-2 rounded-xl 
+        bg-blue-600 hover:bg-blue-700 
+        text-white text-xs sm:text-sm font-semibold 
+        shadow-md hover:shadow-lg 
+        transition-all duration-300"
+    >
+        Get Started
+    </Link>
+</nav> */}
+
+
+
+{/* with blue buttons */}
+{/* <nav className="flex items-center gap-2 sm:gap-4">
+    <ThemeToggle />
+
+    <Link
+        to="/register-salesman"
+        className="px-4 py-2 rounded-xl 
+        bg-blue-600 hover:bg-blue-700
+        text-white text-xs sm:text-sm font-medium
+        shadow-md hover:shadow-lg
+        transition-all duration-300"
+    >
+        Companies
+    </Link>
+
+    <Link
+        to="/login"
+        className="px-4 py-2 rounded-xl 
+        bg-blue-600 hover:bg-blue-700
+        text-white text-xs sm:text-sm font-medium
+        shadow-md hover:shadow-lg
+        transition-all duration-300"
+    >
+        Sign In
+    </Link>
+
+    <Link
+        to="/get-started"
+        className="px-5 py-2 rounded-xl 
+        bg-blue-600 hover:bg-blue-700
+        text-white text-xs sm:text-sm font-semibold
+        shadow-md hover:shadow-xl
+        transition-all duration-300"
+    >
+        Get Started
+    </Link>
+</nav> */}
+
+
+
+
                     </div>
                 </div>
             </header>
@@ -136,9 +299,32 @@ const Home = () => {
                             <Link to="/register" className="px-8 py-4 text-lg font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all shadow-xl shadow-blue-600/20 hover:-translate-y-1">
                                 Start Free Trial
                             </Link>
-                            <Link to="/login" className="px-8 py-4 text-lg font-semibold text-slate-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-blue-600 transition-all shadow-sm hover:-translate-y-1">
+                            {/* <Link to="/login" className="px-8 py-4 text-lg font-semibold text-slate-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-blue-600 transition-all shadow-sm hover:-translate-y-1">
                                 Sign In
-                            </Link>
+                            </Link> */}
+
+                            
+     <Link
+    to="/login"
+    className="
+    px-8 py-4
+    text-lg font-semibold
+    text-slate-700
+    bg-white
+    border border-gray-200
+    rounded-xl
+    hover:bg-gray-50
+    hover:text-blue-600
+    transition-all duration-300
+    shadow-[0_4px_14px_rgba(0,0,0,0.08)]
+    hover:shadow-[0_8px_24px_rgba(37,99,235,0.18)]
+    hover:-translate-y-1
+    "
+>
+    Sign In
+</Link>
+                            
+                            
                         </div>
 
                         {/* Dashboard Preview */}
