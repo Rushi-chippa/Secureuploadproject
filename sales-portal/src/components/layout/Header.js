@@ -52,7 +52,15 @@ const Header = ({ user, company }) => {
         { name: 'Settings', icon: '⚙️', path: '/settings', keywords: 'settings preferences config' },
         { name: 'Profile', icon: '👤', path: '/profile', keywords: 'profile account me' },
         { name: 'Help & Support', icon: '❓', path: '/help', keywords: 'help support faq contact' },
-    ];
+    ].filter(item => {
+        if (user?.role === 'salesman') {
+            return !['/products/add', '/salesmen/add'].includes(item.path);
+        }
+        if (user?.role === 'manager') {
+            return !['/my-sales'].includes(item.path);
+        }
+        return true;
+    });
 
     const filteredNavItems = searchQuery
         ? navItems.filter(item =>
