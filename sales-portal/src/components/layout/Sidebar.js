@@ -8,7 +8,7 @@ const Sidebar = ({ isCollapsed }) => {
     const [expandedItems, setExpandedItems] = useState([]);
     const location = useLocation();
 
-    const dashboardPath = user?.role === 'salesman' ? '/salesman-dashboard' : '/dashboard';
+    const dashboardPath = user?.role?.toLowerCase() === 'salesman' ? '/salesman-dashboard' : '/dashboard';
 
     const menuItems = [
         {
@@ -26,7 +26,7 @@ const Sidebar = ({ isCollapsed }) => {
                 { id: 'product-list', label: 'All Products', path: '/products/list' },
                 { id: 'add-product', label: 'Add Product', path: '/products/add' },
                 { id: 'categories', label: 'Categories', path: '/products/categories' }
-            ].filter(item => user?.role !== 'salesman' || item.id !== 'add-product')
+            ].filter(item => user?.role?.toLowerCase() !== 'salesman' || item.id !== 'add-product')
         },
         {
             id: 'sales',
@@ -38,7 +38,7 @@ const Sidebar = ({ isCollapsed }) => {
                 { id: 'my-sales', label: 'My Sales', path: '/my-sales' },
                 { id: 'add-sale', label: 'Record Sale', path: '/sales/add' },
                 { id: 'sales-report', label: 'Sales Report', path: '/sales/report' }
-            ].filter(item => user?.role !== 'manager' || item.id !== 'my-sales')
+            ].filter(item => user?.role?.toLowerCase() !== 'manager' || item.id !== 'my-sales')
         },
         {
             id: 'salesmen',
@@ -50,7 +50,7 @@ const Sidebar = ({ isCollapsed }) => {
                 { id: 'add-salesman', label: 'Add Salesman', path: '/salesmen/add' },
                 { id: 'performance', label: 'Performance', path: '/salesmen/performance' },
                 { id: 'leaderboard', label: 'Leaderboard', path: '/salesmen/leaderboard' }
-            ].filter(item => user?.role !== 'salesman' || item.id !== 'add-salesman')
+            ].filter(item => user?.role?.toLowerCase() !== 'salesman' || item.id !== 'add-salesman')
         },
         {
             id: 'customers',

@@ -53,10 +53,11 @@ const Header = ({ user, company }) => {
         { name: 'Profile', icon: '👤', path: '/profile', keywords: 'profile account me' },
         { name: 'Help & Support', icon: '❓', path: '/help', keywords: 'help support faq contact' },
     ].filter(item => {
-        if (user?.role === 'salesman') {
+        const role = user?.role?.toLowerCase();
+        if (role === 'salesman') {
             return !['/products/add', '/salesmen/add'].includes(item.path);
         }
-        if (user?.role === 'manager') {
+        if (role === 'manager') {
             return !['/my-sales'].includes(item.path);
         }
         return true;
@@ -425,7 +426,7 @@ const Header = ({ user, company }) => {
                     {!searchQuery && (
                         <nav className="mobile-nav">
                             <div className="mobile-nav-section-title">Main</div>
-                            <Link to={user?.role === 'salesman' ? '/salesman-dashboard' : '/dashboard'} onClick={() => setIsMobileMenuOpen(false)}>
+                            <Link to={user?.role?.toLowerCase() === 'salesman' ? '/salesman-dashboard' : '/dashboard'} onClick={() => setIsMobileMenuOpen(false)}>
                                 <span>📊</span> Dashboard
                             </Link>
 
@@ -433,9 +434,11 @@ const Header = ({ user, company }) => {
                             <Link to="/products/list" onClick={() => setIsMobileMenuOpen(false)}>
                                 <span>📦</span> All Products
                             </Link>
-                            <Link to="/products/add" onClick={() => setIsMobileMenuOpen(false)}>
-                                <span>➕</span> Add Product
-                            </Link>
+                            {user?.role?.toLowerCase() !== 'salesman' && (
+                                <Link to="/products/add" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <span>➕</span> Add Product
+                                </Link>
+                            )}
                             <Link to="/products/categories" onClick={() => setIsMobileMenuOpen(false)}>
                                 <span>📑</span> Categories
                             </Link>
@@ -444,9 +447,11 @@ const Header = ({ user, company }) => {
                             <Link to="/sales/list" onClick={() => setIsMobileMenuOpen(false)}>
                                 <span>💰</span> All Sales
                             </Link>
-                            <Link to="/my-sales" onClick={() => setIsMobileMenuOpen(false)}>
-                                <span>🧾</span> My Sales
-                            </Link>
+                            {user?.role?.toLowerCase() !== 'manager' && (
+                                <Link to="/my-sales" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <span>🧾</span> My Sales
+                                </Link>
+                            )}
                             <Link to="/sales/add" onClick={() => setIsMobileMenuOpen(false)}>
                                 <span>📝</span> Record Sale
                             </Link>
