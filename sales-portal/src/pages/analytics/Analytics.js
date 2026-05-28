@@ -610,7 +610,7 @@ const Analytics = () => {
                 {!isProductDrillDown && (
                 <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 lg:col-span-2 overflow-x-auto" style={{ minWidth: 0 }}>
                     <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4 sm:mb-6">Revenue by Product</h3>
-                    <div className="h-72 sm:h-64 min-w-[500px] sm:min-w-0">
+                    <div className="h-72 sm:h-64 w-full">
                         <Bar data={displayProductChartData} options={{
                             responsive: true,
                             maintainAspectRatio: false,
