@@ -31,6 +31,7 @@ class User(Base):
     phone = Column(String, nullable=True)
     region = Column(String, nullable=True)
     sales_target = Column(Integer, nullable=True)
+    avatar_url = Column(String, nullable=True)
     company_id = Column(Integer, ForeignKey("companies.id"))
     created_at = Column(DateTime, default=datetime.utcnow)
     

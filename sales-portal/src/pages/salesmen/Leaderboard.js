@@ -72,10 +72,10 @@ const Leaderboard = () => {
     const rest = leaderboardData.slice(3);
 
     return (
-        <div className="p-6 min-h-screen bg-slate-50 dark:bg-slate-900">
-            <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+        <div className="p-4 sm:p-6 min-h-screen bg-slate-50 dark:bg-slate-900">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-8 sm:mb-10 gap-4">
                 <div className="text-center md:text-left">
-                    <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">🏆 Sales Leaderboard</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">🏆 Sales Leaderboard</h1>
                     <p className="text-slate-500 dark:text-slate-400">Top performers at <span className="font-semibold text-blue-600 dark:text-blue-400">{companyName}</span></p>
                 </div>
 
@@ -87,17 +87,17 @@ const Leaderboard = () => {
             </div>
 
             {/* Podium Section */}
-            <div className="flex justify-center items-end gap-4 mb-12 h-64">
+            <div className="flex justify-center items-end gap-2 sm:gap-4 mb-10 sm:mb-12 h-56 sm:h-64">
                 {/* 2nd Place */}
                 {topThree[1] && (
                     <div className="flex flex-col items-center animate-in slide-in-from-bottom-4 duration-700 delay-100">
-                        <div className="w-20 h-20 rounded-full border-4 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 shadow-lg flex items-center justify-center text-2xl font-bold text-slate-600 dark:text-slate-300 mb-[-20px] z-10 relative">
+                        <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full border-4 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 shadow-lg flex items-center justify-center text-lg sm:text-2xl font-bold text-slate-600 dark:text-slate-300 mb-[-12px] sm:mb-[-20px] z-10 relative">
                             {topThree[1].avatar}
                         </div>
-                        <div className="bg-gradient-to-t from-slate-200 to-slate-100 dark:from-slate-700 dark:to-slate-800 w-32 h-40 rounded-t-lg shadow-md flex flex-col items-center justify-start pt-8 pb-4 border-t-4 border-slate-300 dark:border-slate-600">
-                            <span className="text-3xl font-bold text-slate-400 dark:text-slate-500 mb-2">2</span>
-                            <p className="font-semibold text-slate-800 dark:text-slate-100">{topThree[1].name.split(' ')[0]}</p>
-                            <p className="text-sm text-slate-600 dark:text-slate-300 font-bold">₹{topThree[1].revenue.toLocaleString()}</p>
+                        <div className="bg-gradient-to-t from-slate-200 to-slate-100 dark:from-slate-700 dark:to-slate-800 w-24 sm:w-32 h-32 sm:h-40 rounded-t-lg shadow-md flex flex-col items-center justify-start pt-5 sm:pt-8 pb-4 border-t-4 border-slate-300 dark:border-slate-600">
+                            <span className="text-2xl sm:text-3xl font-bold text-slate-400 dark:text-slate-500 mb-1 sm:mb-2">2</span>
+                            <p className="font-semibold text-xs sm:text-base text-slate-800 dark:text-slate-100 w-full text-center truncate px-1">{topThree[1].name.split(' ')[0]}</p>
+                            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-bold">₹{topThree[1].revenue.toLocaleString()}</p>
                         </div>
                     </div>
                 )}
@@ -106,15 +106,15 @@ const Leaderboard = () => {
                 {topThree[0] && (
                     <div className="flex flex-col items-center animate-in slide-in-from-bottom-8 duration-700">
                         <div className="relative">
-                            <span className="absolute -top-8 left-1/2 -translate-x-1/2 text-4xl">👑</span>
-                            <div className="w-24 h-24 rounded-full border-4 border-yellow-400 dark:border-yellow-500 bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center text-3xl font-bold text-yellow-600 dark:text-yellow-500 mb-[-25px] z-20 relative">
+                            <span className="absolute -top-6 sm:-top-8 left-1/2 -translate-x-1/2 text-2xl sm:text-4xl">👑</span>
+                            <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full border-4 border-yellow-400 dark:border-yellow-500 bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center text-xl sm:text-3xl font-bold text-yellow-600 dark:text-yellow-500 mb-[-16px] sm:mb-[-25px] z-20 relative">
                                 {topThree[0].avatar}
                             </div>
                         </div>
-                        <div className="bg-gradient-to-t from-yellow-100 to-yellow-50 dark:from-yellow-900/30 dark:to-yellow-800/20 w-40 h-52 rounded-t-lg shadow-xl flex flex-col items-center justify-start pt-10 pb-4 border-t-4 border-yellow-400 dark:border-yellow-500 z-10">
-                            <span className="text-4xl font-bold text-yellow-500 mb-2">1</span>
-                            <p className="font-bold text-lg text-slate-800 dark:text-slate-100">{topThree[0].name.split(' ')[0]}</p>
-                            <p className="text-base text-yellow-700 dark:text-yellow-400 font-bold bg-yellow-200 dark:bg-yellow-900/50 px-3 py-1 rounded-full mt-1">
+                        <div className="bg-gradient-to-t from-yellow-100 to-yellow-50 dark:from-yellow-900/30 dark:to-yellow-800/20 w-28 sm:w-40 h-40 sm:h-52 rounded-t-lg shadow-xl flex flex-col items-center justify-start pt-6 sm:pt-10 pb-4 border-t-4 border-yellow-400 dark:border-yellow-500 z-10">
+                            <span className="text-3xl sm:text-4xl font-bold text-yellow-500 mb-1 sm:mb-2">1</span>
+                            <p className="font-bold text-sm sm:text-lg text-slate-800 dark:text-slate-100 w-full text-center truncate px-1">{topThree[0].name.split(' ')[0]}</p>
+                            <p className="text-xs sm:text-base text-yellow-700 dark:text-yellow-400 font-bold bg-yellow-200 dark:bg-yellow-900/50 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full mt-1 truncate max-w-[95%]">
                                 ₹{topThree[0].revenue.toLocaleString()}
                             </p>
                         </div>
@@ -124,13 +124,13 @@ const Leaderboard = () => {
                 {/* 3rd Place */}
                 {topThree[2] && (
                     <div className="flex flex-col items-center animate-in slide-in-from-bottom-4 duration-700 delay-200">
-                        <div className="w-20 h-20 rounded-full border-4 border-orange-300 dark:border-orange-500 bg-white dark:bg-slate-800 shadow-lg flex items-center justify-center text-2xl font-bold text-orange-600 dark:text-orange-500 mb-[-20px] z-10 relative">
+                        <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full border-4 border-orange-300 dark:border-orange-500 bg-white dark:bg-slate-800 shadow-lg flex items-center justify-center text-lg sm:text-2xl font-bold text-orange-600 dark:text-orange-500 mb-[-12px] sm:mb-[-20px] z-10 relative">
                             {topThree[2].avatar}
                         </div>
-                        <div className="bg-gradient-to-t from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-800/20 w-32 h-32 rounded-t-lg shadow-md flex flex-col items-center justify-start pt-8 pb-4 border-t-4 border-orange-300 dark:border-orange-500">
-                            <span className="text-3xl font-bold text-orange-400 mb-2">3</span>
-                            <p className="font-semibold text-slate-800 dark:text-slate-100">{topThree[2].name.split(' ')[0]}</p>
-                            <p className="text-sm text-slate-600 dark:text-slate-300 font-bold">₹{topThree[2].revenue.toLocaleString()}</p>
+                        <div className="bg-gradient-to-t from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-800/20 w-24 sm:w-32 h-24 sm:h-32 rounded-t-lg shadow-md flex flex-col items-center justify-start pt-5 sm:pt-8 pb-4 border-t-4 border-orange-300 dark:border-orange-500">
+                            <span className="text-2xl sm:text-3xl font-bold text-orange-400 mb-1 sm:mb-2">3</span>
+                            <p className="font-semibold text-xs sm:text-base text-slate-800 dark:text-slate-100 w-full text-center truncate px-1">{topThree[2].name.split(' ')[0]}</p>
+                            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-bold">₹{topThree[2].revenue.toLocaleString()}</p>
                         </div>
                     </div>
                 )}
@@ -142,24 +142,24 @@ const Leaderboard = () => {
                     <table className="w-full text-left">
                         <thead className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-700">
                             <tr>
-                                <th className="p-4 text-slate-500 font-medium">Rank</th>
-                                <th className="p-4 text-slate-500 font-medium">Salesman</th>
-                                <th className="p-4 text-center text-slate-500 font-medium">Quantity</th>
-                                <th className="p-4 text-right text-slate-500 font-medium">Revenue</th>
+                                <th className="p-3 sm:p-4 text-slate-500 font-medium">Rank</th>
+                                <th className="p-3 sm:p-4 text-slate-500 font-medium">Salesman</th>
+                                <th className="p-3 sm:p-4 text-center text-slate-500 font-medium">Quantity</th>
+                                <th className="p-3 sm:p-4 text-right text-slate-500 font-medium">Revenue</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50 dark:divide-slate-700">
                             {rest.map((salesman) => (
                                 <tr key={salesman.rank} className="hover:bg-slate-50/50 dark:hover:bg-slate-700/50 transition-colors">
-                                    <td className="p-4 text-slate-400 dark:text-slate-500 font-bold">#{salesman.rank}</td>
-                                    <td className="p-4 flex items-center gap-3">
+                                    <td className="p-3 sm:p-4 text-slate-400 dark:text-slate-500 font-bold">#{salesman.rank}</td>
+                                    <td className="p-3 sm:p-4 flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-500 dark:text-slate-400">
                                             {salesman.avatar}
                                         </div>
                                         <span className="font-medium text-slate-700 dark:text-slate-200">{salesman.name}</span>
                                     </td>
-                                    <td className="p-4 text-center text-slate-600 dark:text-slate-300">{salesman.quantity}</td>
-                                    <td className="p-4 text-right font-bold text-slate-800 dark:text-slate-100">
+                                    <td className="p-3 sm:p-4 text-center text-slate-600 dark:text-slate-300">{salesman.quantity}</td>
+                                    <td className="p-3 sm:p-4 text-right font-bold text-slate-800 dark:text-slate-100">
                                         ₹{salesman.revenue.toLocaleString()}
                                     </td>
                                 </tr>

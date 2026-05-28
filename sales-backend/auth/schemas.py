@@ -22,6 +22,7 @@ class UserResponse(BaseModel):
     name: str
     email: str
     role: str
+    avatar: Optional[str] = None
 
 class SalesmanRegisterRequest(BaseModel):
     full_name: str

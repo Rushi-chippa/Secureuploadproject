@@ -153,7 +153,8 @@ def register(
                 "id": new_user.id,
                 "name": new_user.full_name,
                 "email": new_user.email,
-                "role": new_user.role
+                "role": new_user.role,
+                "avatar": new_user.avatar_url
             },
             "company": {
                 "name": new_company.name,
@@ -211,7 +212,8 @@ def login(login_data: schemas.LoginRequest, db: Session = Depends(get_db)):
             "id": user.id,
             "name": user.full_name,
             "email": user.email,
-            "role": user.role
+            "role": user.role,
+            "avatar": user.avatar_url
         },
         "company": company_data
     }
@@ -264,7 +266,8 @@ def register_salesman(salesman_data: schemas.SalesmanRegisterRequest, db: Sessio
                 "id": new_user.id,
                 "name": new_user.full_name,
                 "email": new_user.email,
-                "role": new_user.role
+                "role": new_user.role,
+                "avatar": new_user.avatar_url
             },
             "company": {
                 "name": company.name,
@@ -323,3 +326,52 @@ def reset_password(request: schemas.ResetPasswordRequest, db: Session = Depends(
     db.commit()
     
     return {"message": "Password updated successfully"}
+
+@router.put("/profile")
+def update_profile(
+    full_name: str = Form(None),
+    phone: str = Form(None),
+    avatar: UploadFile = File(None),
+    remove_avatar: str = Form("false"),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(utils.get_current_active_user)
+):
+    try:
+        if full_name is not None:
+            current_user.full_name = full_name
+        if phone is not None:
+            current_user.phone = phone
+            
+        if remove_avatar.lower() == 'true':
+            current_user.avatar_url = None
+            
+        if avatar:
+            os.makedirs("static/avatars", exist_ok=True)
+            file_extension = avatar.filename.split(".")[-1]
+            filename = f"{uuid.uuid4()}.{file_extension}"
+            file_path = f"static/avatars/{filename}"
+            
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(avatar.file, buffer)
+            
+            current_user.avatar_url = f"/static/avatars/{filename}"
+            
+        db.commit()
+        db.refresh(current_user)
+        
+        return {
+            "message": "Profile updated successfully",
+            "user": {
+                "id": current_user.id,
+                "name": current_user.full_name,
+                "email": current_user.email,
+                "role": current_user.role,
+                "phone": current_user.phone,
+                "company_id": current_user.company_id,
+                "avatar": current_user.avatar_url
+            }
+        }
+    except Exception as e:
+        db.rollback()
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))

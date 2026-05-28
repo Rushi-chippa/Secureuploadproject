@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useData } from '../../context/DataContext';
+import { useAuth } from '../../context/AuthContext';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
@@ -8,18 +9,13 @@ import './Layout.css';
 
 const Layout = ({ children }) => {
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-    const [user, setUser] = useState(null);
+    const { user } = useAuth();
     const [company, setCompany] = useState(null);
 
     const { fetchAllData } = useData();
 
     useEffect(() => {
-        const userData = localStorage.getItem('user');
         const companyData = localStorage.getItem('company');
-
-        if (userData) {
-            setUser(JSON.parse(userData));
-        }
 
         if (companyData) {
             setCompany(JSON.parse(companyData));

@@ -257,7 +257,7 @@ const Header = ({ user, company }) => {
                     >
                         <div className="profile-avatar">
                             {user?.avatar ? (
-                                <img src={user.avatar} alt="Profile" />
+                                <img src={user.avatar.startsWith('http') || user.avatar.startsWith('data:') ? user.avatar : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8001'}${user.avatar}`} alt="Profile" />
                             ) : (
                                 <img
                                     src={user?.role === 'manager'
@@ -331,7 +331,7 @@ const Header = ({ user, company }) => {
                     <div className="mobile-user-card flex items-center gap-3 p-3 bg-white dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-700/80 mb-1">
                         <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-50 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0">
                             {user?.avatar ? (
-                                <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
+                                <img src={user.avatar.startsWith('http') || user.avatar.startsWith('data:') ? user.avatar : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8001'}${user.avatar}`} alt="Profile" className="w-full h-full object-cover" />
                             ) : (
                                 <img
                                     src={user?.role === 'manager'
