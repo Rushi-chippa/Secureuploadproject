@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile, Form
+from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile, Form, BackgroundTasks
 from sqlalchemy.orm import Session
 from database import get_db
 from auth import models, utils, schemas
@@ -288,8 +288,11 @@ import random
 from datetime import datetime, timedelta
 
 @router.post("/forgot-password")
-def forgot_password(request: schemas.ForgotPasswordRequest, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.email == request.email).first()
+def forgot_password(request: schemas.ForgotPasswordRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    # Clean email to prevent whitespace or case issues
+    clean_email = request.email.strip().lower()
+    
+    user = db.query(models.User).filter(models.User.email == clean_email).first()
     if not user:
         # For security, don't reveal if user exists. 
         # Just say if email exists, instructions sent.
@@ -302,9 +305,9 @@ def forgot_password(request: schemas.ForgotPasswordRequest, db: Session = Depend
     
     db.commit()
     
-    # Send Email (currently prints to console)
+    # Send Email in Background
     from utils.email_utils import send_reset_password_email
-    send_reset_password_email(user.email, otp)
+    background_tasks.add_task(send_reset_password_email, user.email, otp)
     
     return {"message": "If this email is registered, an OTP will be sent shortly."}
 
