@@ -4,14 +4,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+# Google Apps Script Web App URL (bypasses Render's SMTP port blocks)
+APPS_SCRIPT_URL = os.getenv("GOOGLE_APPS_SCRIPT_URL", "")
 
-load_dotenv()
-
-EMAIL_USER = os.getenv("EMAIL_USER")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+# ---------------------------------------------------------------------------
+# HTML Email Templates
+# ---------------------------------------------------------------------------
 
 def get_otp_email_template(otp: str):
     """Returns a professional HTML email template for password reset via OTP."""
@@ -46,44 +44,48 @@ def get_otp_email_template(otp: str):
     </html>
     """
 
+
 def send_reset_password_email(email: str, otp: str):
-    """Sends a real HTML email using Gmail SMTP."""
-    
+    """Sends an OTP email via Google Apps Script Web App (bypasses SMTP firewall)."""
+
     print("\n" + "="*50)
     print(f"DEBUG: Attempting to send OTP email to: {email}")
     print(f"DEBUG: OTP CODE: {otp}")
     print("="*50 + "\n")
 
-    if not EMAIL_USER or not EMAIL_PASSWORD:
-        print("ERROR: EMAIL_USER or EMAIL_PASSWORD not found in environment variables.")
+    if not APPS_SCRIPT_URL:
+        print("ERROR: GOOGLE_APPS_SCRIPT_URL not set in environment variables.")
         return False
 
     try:
-        # Set up the MIME message
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = "Reset your Sales Portal password - Your OTP"
-        msg['From'] = f"Sales Portal <{EMAIL_USER}>"
-        msg['To'] = email
+        payload = {
+            "to": email,
+            "subject": "Reset your Sales Portal password - Your OTP",
+            "body": get_otp_email_template(otp)
+        }
+        response = requests.post(
+            APPS_SCRIPT_URL,
+            json=payload,
+            timeout=15
+        )
+        response.raise_for_status()
 
-        # Create the HTML content
-        html_content = get_otp_email_template(otp)
-        part = MIMEText(html_content, 'html')
-        msg.attach(part)
+        result = response.json()
+        if result.get("status") == "success":
+            print(f"SUCCESS: OTP Email sent successfully via Apps Script to {email}")
+            return True
+        else:
+            print(f"ERROR from Apps Script: {result}")
+            return False
 
-        # Connect to Gmail SMTP Server and Send
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(EMAIL_USER, EMAIL_PASSWORD)
-        server.sendmail(EMAIL_USER, email, msg.as_string())
-        server.quit()
-        
-        print(f"SUCCESS: OTP Email sent successfully via Gmail to {email}")
-        return True
-            
     except Exception as e:
-        print(f"CRITICAL ERROR: Failed to send email via Gmail: {str(e)}")
+        print(f"CRITICAL ERROR: Failed to send OTP email: {str(e)}")
         return False
 
+
+# ---------------------------------------------------------------------------
+# Invoice Email
+# ---------------------------------------------------------------------------
 
 def get_invoice_email_template(full_name: str, company_name: str, plan_name: str, amount: str, invoice_no: str, date_str: str):
     """Returns a premium responsive HTML email template for subscription invoices."""
@@ -153,7 +155,7 @@ def get_invoice_email_template(full_name: str, company_name: str, plan_name: str
             </table>
 
             <div style="text-align: center; margin-top: 30px;">
-                <a href="https://salesportal.duckdns.org/login" class="button" style="color: #ffffff !important;">Access Your Dashboard</a>
+                <a href="https://sales-frontend-vafv.onrender.com/login" class="button" style="color: #ffffff !important;">Access Your Dashboard</a>
             </div>
 
             <p style="margin-top: 30px; font-size: 13px; color: #64748b;">If you have any questions regarding this invoice or your subscription settings, please reply directly to this email or visit our support desk.</p>
@@ -171,47 +173,43 @@ def get_invoice_email_template(full_name: str, company_name: str, plan_name: str
 
 
 def send_welcome_invoice_email(email: str, full_name: str, company_name: str, plan_name: str, amount: str):
-    """Sends a professional subscription confirmation HTML invoice using SMTP."""
+    """Sends a professional subscription confirmation HTML invoice via Google Apps Script."""
     import datetime
     import random
-    
+
     print("\n" + "="*50)
     print(f"DEBUG: Attempting to send welcome invoice to: {email}")
     print(f"DEBUG: PLAN: {plan_name} | AMOUNT: {amount}")
     print("="*50 + "\n")
 
-    if not EMAIL_USER or not EMAIL_PASSWORD:
-        print("ERROR: EMAIL_USER or EMAIL_PASSWORD not found in environment variables. Invoice email skipped.")
+    if not APPS_SCRIPT_URL:
+        print("ERROR: GOOGLE_APPS_SCRIPT_URL not set in environment variables. Invoice email skipped.")
         return False
 
     try:
-        # Generate receipt values
         invoice_no = f"INV-2026-{random.randint(10000, 99999)}"
         date_str = datetime.datetime.now().strftime("%B %d, %Y")
-        
-        # Set up the MIME message
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = f"Invoice for your SalesPortal '{plan_name}' Subscription"
-        msg['From'] = f"SalesPortal Billing <{EMAIL_USER}>"
-        msg['To'] = email
 
-        # Create the HTML content
-        html_content = get_invoice_email_template(full_name, company_name, plan_name, amount, invoice_no, date_str)
-        part = MIMEText(html_content, 'html')
-        msg.attach(part)
+        payload = {
+            "to": email,
+            "subject": f"Invoice for your SalesPortal '{plan_name}' Subscription",
+            "body": get_invoice_email_template(full_name, company_name, plan_name, amount, invoice_no, date_str)
+        }
+        response = requests.post(
+            APPS_SCRIPT_URL,
+            json=payload,
+            timeout=15
+        )
+        response.raise_for_status()
 
-        # Connect to Gmail SMTP Server and Send
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(EMAIL_USER, EMAIL_PASSWORD)
-        server.sendmail(EMAIL_USER, email, msg.as_string())
-        server.quit()
-        
-        print(f"SUCCESS: Invoice Email sent successfully via Gmail to {email}")
-        return True
-            
+        result = response.json()
+        if result.get("status") == "success":
+            print(f"SUCCESS: Invoice Email sent successfully via Apps Script to {email}")
+            return True
+        else:
+            print(f"ERROR from Apps Script: {result}")
+            return False
+
     except Exception as e:
-        print(f"CRITICAL ERROR: Failed to send invoice email via Gmail: {str(e)}")
+        print(f"CRITICAL ERROR: Failed to send invoice email: {str(e)}")
         return False
-
-
