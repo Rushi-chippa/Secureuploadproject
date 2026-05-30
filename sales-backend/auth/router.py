@@ -294,9 +294,10 @@ def forgot_password(request: schemas.ForgotPasswordRequest, background_tasks: Ba
     
     user = db.query(models.User).filter(models.User.email == clean_email).first()
     if not user:
-        # For security, don't reveal if user exists. 
-        # Just say if email exists, instructions sent.
-        return {"message": "If this email is registered, an OTP will be sent shortly."}
+        raise HTTPException(
+            status_code=404,
+            detail="No account found with this email address. Please check and try again."
+        )
     
     # Generate 6-digit OTP
     otp = str(random.randint(100000, 999999))
