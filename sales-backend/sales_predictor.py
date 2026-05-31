@@ -78,7 +78,7 @@ class SalesPredictor:
             next_date = current_date + pd.DateOffset(months=i)
             next_ordinal = next_date.toordinal()
             
-            prediction = self.model.predict([[next_ordinal]])[0]
+            prediction = self.model.predict(pd.DataFrame([[next_ordinal]], columns=['month_ordinal']))[0]
             
             # Ensure no negative sales
             prediction = max(0, prediction)
