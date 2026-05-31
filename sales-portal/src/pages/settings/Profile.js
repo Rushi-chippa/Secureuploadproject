@@ -220,9 +220,11 @@ const Profile = () => {
                         <div className="info-value">{user.email}</div>
                     </div>
 
-                    {/* Employee ID — read only */}
+                    {/* ID — read only; label changes based on role */}
                     <div className="info-item">
-                        <label className="form-label">Employee ID</label>
+                        <label className="form-label">
+                            {user.role === 'manager' ? 'Manager ID' : 'Employee ID'}
+                        </label>
                         <div className="info-value">{user.employee_id || user.id || '—'}</div>
                     </div>
 

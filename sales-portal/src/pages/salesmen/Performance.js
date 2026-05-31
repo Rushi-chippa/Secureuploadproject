@@ -205,7 +205,7 @@ const Performance = () => {
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                             {sales.length > 0 ? (
-                                sales.map((sale) => (
+                                [...sales].sort((a, b) => new Date(a.date) - new Date(b.date)).map((sale) => (
                                     <tr key={sale.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                                         <td className="p-4 text-slate-600 dark:text-slate-300 font-medium">
                                             {new Date(sale.date).toLocaleDateString()}
