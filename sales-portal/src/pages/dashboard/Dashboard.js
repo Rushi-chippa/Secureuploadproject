@@ -27,6 +27,7 @@ const Dashboard = () => {
     const monthOptions = React.useMemo(() => {
         const options = [];
         const date = new Date();
+        date.setDate(1); // Prevent month rollover (e.g. May 31 - 1 month = May 1, not April 31)
         const startYear = 2026;
         const startMonth = 0;
         while (date.getFullYear() > startYear || (date.getFullYear() === startYear && date.getMonth() >= startMonth)) {
