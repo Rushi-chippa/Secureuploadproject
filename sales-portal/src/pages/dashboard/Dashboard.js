@@ -71,10 +71,14 @@ const Dashboard = () => {
     for (let i = 1; i <= daysInMonth; i++) { currentMonthSales[i] = 0; }
 
     const filteredLocalSales = sales.filter(sale => {
-        const saleDate = new Date(sale.date);
-        return saleDate.getMonth() === currentMonthIndex && saleDate.getFullYear() === currentYear;
+        // Parse date parts directly to avoid UTC→local timezone shift (e.g. IST UTC+5:30)
+        const [sYear, sMonth, sDay] = sale.date.substring(0, 10).split('-').map(Number);
+        return (sMonth - 1) === currentMonthIndex && sYear === currentYear;
     });
-    filteredLocalSales.forEach(sale => { const d = new Date(sale.date); currentMonthSales[d.getDate()] += sale.amount; });
+    filteredLocalSales.forEach(sale => {
+        const [, , sDay] = sale.date.substring(0, 10).split('-').map(Number);
+        currentMonthSales[sDay] += sale.amount;
+    });
 
     const dailyLabels = Object.keys(currentMonthSales).map(day => `Day ${day}`);
     const dailyData = Object.values(currentMonthSales);
