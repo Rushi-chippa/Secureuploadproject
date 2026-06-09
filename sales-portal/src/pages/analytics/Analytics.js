@@ -36,17 +36,19 @@ const Analytics = () => {
     const [predictionData, setPredictionData] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const currentMonthStr = new Date().toISOString().slice(0, 7);
+    const now = new Date();
+    const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const [selectedMonth, setSelectedMonth] = useState(currentMonthStr);
 
     const monthOptions = React.useMemo(() => {
         const options = [];
         const date = new Date();
+        date.setDate(1); // Set to 1st to prevent rollover
         const startYear = 2026;
         const startMonth = 0; // January
 
         while (date.getFullYear() > startYear || (date.getFullYear() === startYear && date.getMonth() >= startMonth)) {
-            const val = date.toISOString().slice(0, 7);
+            const val = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
             const label = date.toLocaleString('default', { month: 'long', year: 'numeric' });
             options.push({ value: val, label });
             date.setMonth(date.getMonth() - 1);
@@ -137,7 +139,7 @@ const Analytics = () => {
     const todayGlobal = new Date();
     for (let i = 4; i >= 0; i--) {
         const d = new Date(todayGlobal.getFullYear(), todayGlobal.getMonth() - i, 1);
-        last6MonthsGlobal.push(d.toISOString().slice(0, 7));
+        last6MonthsGlobal.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
     }
 
     const monthlyChartLabels = last6MonthsGlobal.map(m => new Date(m).toLocaleString('default', { month: 'short' }));
@@ -202,7 +204,7 @@ const Analytics = () => {
         const todayDrill = new Date();
         for (let i = 4; i >= 0; i--) {
             const d = new Date(todayDrill.getFullYear(), todayDrill.getMonth() - i, 1);
-            last6Months.push(d.toISOString().slice(0, 7));
+            last6Months.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
         }
 
         const productMonthlyTrend = last6Months.reduce((acc, month) => {

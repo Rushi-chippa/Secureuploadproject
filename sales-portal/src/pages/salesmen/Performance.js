@@ -27,7 +27,8 @@ const Performance = () => {
     const [sales, setSales] = useState([]);
     const [leaderboard, setLeaderboard] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
+    const now = new Date();
+    const [selectedMonth, setSelectedMonth] = useState(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`); // YYYY-MM
 
     useEffect(() => {
         const fetchPerformanceData = async () => {
@@ -106,9 +107,9 @@ const Performance = () => {
     };
 
     const handleMonthChange = (offset) => {
-        const current = new Date(selectedMonth + "-01");
-        current.setMonth(current.getMonth() + offset);
-        setSelectedMonth(current.toISOString().slice(0, 7));
+        const [year, month] = selectedMonth.split('-').map(Number);
+        const current = new Date(year, month - 1 + offset, 1);
+        setSelectedMonth(`${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}`);
     };
 
     const formatMonth = (isoMonth) => {

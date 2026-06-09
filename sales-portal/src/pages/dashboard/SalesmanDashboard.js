@@ -10,7 +10,8 @@ const SalesmanDashboard = () => {
     const [isLoadingStats, setIsLoadingStats] = useState(true);
     const [showModal, setShowModal] = useState(false);
 
-    const currentMonthStr = new Date().toISOString().slice(0, 7);
+    const now = new Date();
+    const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const [selectedMonth, setSelectedMonth] = useState(currentMonthStr);
 
     const monthOptions = React.useMemo(() => {
@@ -21,7 +22,7 @@ const SalesmanDashboard = () => {
         const startMonth = 0; // January
         
         while (date.getFullYear() > startYear || (date.getFullYear() === startYear && date.getMonth() >= startMonth)) {
-            const val = date.toISOString().slice(0, 7);
+            const val = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
             const label = date.toLocaleString('default', { month: 'long', year: 'numeric' });
             options.push({ value: val, label });
             date.setMonth(date.getMonth() - 1);
@@ -42,7 +43,7 @@ const SalesmanDashboard = () => {
         productId: '',
         quantity: '',
         amount: '',
-        date: new Date().toISOString().split('T')[0],
+        date: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`,
         customerName: '', // "Trader Name"
         region: '',
         notes: ''
@@ -137,7 +138,7 @@ const SalesmanDashboard = () => {
             setShowModal(false);
             setFormData({
                 productId: '', quantity: '', amount: '',
-                date: new Date().toISOString().split('T')[0],
+                date: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`,
                 customerName: '', region: '', notes: ''
             });
             // Refresh stats

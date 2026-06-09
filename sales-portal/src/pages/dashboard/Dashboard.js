@@ -21,7 +21,8 @@ const Dashboard = () => {
     const { sales, fetchAllData, getDashboardStats } = useData();
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
-    const currentMonthStr = new Date().toISOString().slice(0, 7);
+    const now = new Date();
+    const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const [selectedMonth, setSelectedMonth] = useState(currentMonthStr);
 
     const monthOptions = React.useMemo(() => {
@@ -31,7 +32,7 @@ const Dashboard = () => {
         const startYear = 2026;
         const startMonth = 0;
         while (date.getFullYear() > startYear || (date.getFullYear() === startYear && date.getMonth() >= startMonth)) {
-            const val = date.toISOString().slice(0, 7);
+            const val = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
             const label = date.toLocaleString('default', { month: 'long', year: 'numeric' });
             options.push({ value: val, label });
             date.setMonth(date.getMonth() - 1);

@@ -11,7 +11,8 @@ const Salesmen = () => {
     const [showModal, setShowModal] = useState(false);
     const location = useLocation();
 
-    const currentMonthStr = new Date().toISOString().slice(0, 7);
+    const now = new Date();
+    const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const [selectedMonth, setSelectedMonth] = useState(currentMonthStr);
 
     const monthOptions = React.useMemo(() => {
@@ -22,7 +23,7 @@ const Salesmen = () => {
         const startMonth = 0; // January
         
         while (date.getFullYear() > startYear || (date.getFullYear() === startYear && date.getMonth() >= startMonth)) {
-            const val = date.toISOString().slice(0, 7);
+            const val = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
             const label = date.toLocaleString('default', { month: 'long', year: 'numeric' });
             options.push({ value: val, label });
             date.setMonth(date.getMonth() - 1);
@@ -142,8 +143,7 @@ const Salesmen = () => {
     const getSalesmanStats = (salesmanId) => {
         const salesmanSales = sales.filter(s => {
             if (s.user_id !== salesmanId) return false;
-            if (!s.date) return false;
-            const saleMonth = new Date(s.date).toISOString().slice(0, 7);
+            const saleMonth = s.date.substring(0, 7);
             return saleMonth === selectedMonth;
         });
         const totalAmount = salesmanSales.reduce((sum, s) => sum + s.amount, 0);
