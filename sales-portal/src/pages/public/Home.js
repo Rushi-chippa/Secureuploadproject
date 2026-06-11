@@ -4,7 +4,7 @@ import { Link, Navigate } from 'react-router-dom';
 import ThemeToggle from '../../components/common/ThemeToggle';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
-import axios from 'axios';
+import api from '../../services/api';
 
 const successModalStyles = `
 @keyframes checkmark-stroke {
@@ -52,14 +52,14 @@ const Home = () => {
     const [sending, setSending] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [stats, setStats] = useState({
-        companies_count: 0,
-        salesmen_count: 0,
-        total_sales_amount: 0,
+        companies_count: 6,
+        salesmen_count: 5,
+        total_sales_amount: 327600,
         uptime: '99.9%'
     });
 
     useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_BASE_URL || `http://${window.location.hostname}:8001`}/auth/public-stats`)
+        api.get('/auth/public-stats')
             .then(res => {
                 if (res.data) {
                     setStats(res.data);
@@ -83,7 +83,7 @@ const Home = () => {
         setSending(true);
 
         // Send support ticket directly to backend SMTP relay
-        axios.post(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8001'}/api/contact`, payload)
+        api.post('/api/contact', payload)
             .then((result) => {
                 setSending(false);
                 if (!result.data.success) {
