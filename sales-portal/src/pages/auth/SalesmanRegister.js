@@ -139,9 +139,9 @@ const SalesmanRegister = () => {
                                 </div>
 
                                 {loadingCompanies ? (
-                                    <div className="flex flex-col items-center justify-center p-20 gap-4">
+                                    <div className="flex flex-col items-center justify-center py-20 px-4 sm:p-20 gap-4">
                                         <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
-                                        <p className="text-slate-500 animate-pulse">Loading companies...</p>
+                                        <p className="text-slate-500 animate-pulse whitespace-nowrap">Loading companies...</p>
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-8">
