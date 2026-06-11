@@ -136,12 +136,12 @@ const Home = () => {
 
 
 
-<nav className="flex items-center gap-2 sm:gap-3 md:gap-4">
-    <ThemeToggle />
+                        <nav className="flex items-center gap-2 sm:gap-3 md:gap-4">
+                            <ThemeToggle />
 
-    <Link
-        to="/register-salesman"
-        className="
+                            <Link
+                                to="/register-salesman"
+                                className="
         px-2 sm:px-4
         py-1.5 sm:py-2
         rounded-lg sm:rounded-xl
@@ -154,13 +154,13 @@ const Home = () => {
         transition-all duration-300
         whitespace-nowrap
         "
-    >
-        Companies
-    </Link>
+                            >
+                                Companies
+                            </Link>
 
-    <Link
-        to="/login"
-        className="
+                            <Link
+                                to="/login"
+                                className="
         px-2 sm:px-4
         py-1.5 sm:py-2
         rounded-lg sm:rounded-xl
@@ -173,13 +173,13 @@ const Home = () => {
         transition-all duration-300
         whitespace-nowrap
         "
-    >
-        Sign In
-    </Link>
+                            >
+                                Sign In
+                            </Link>
 
-    <Link
-        to="/get-started"
-        className="
+                            <Link
+                                to="/get-started"
+                                className="
         px-3 sm:px-5
         py-1.5 sm:py-2
         rounded-lg sm:rounded-xl
@@ -191,10 +191,10 @@ const Home = () => {
         transition-all duration-300
         whitespace-nowrap
         "
-    >
-        Get Started
-    </Link>
-</nav>
+                            >
+                                Get Started
+                            </Link>
+                        </nav>
 
 
 
@@ -209,8 +209,8 @@ const Home = () => {
 
 
 
-{/* with while buttons*/}
-{/* 
+                        {/* with while buttons*/}
+                        {/* 
 <nav className="flex items-center gap-2 sm:gap-4">
     <ThemeToggle />
 
@@ -254,8 +254,8 @@ const Home = () => {
 
 
 
-{/* with blue buttons */}
-{/* <nav className="flex items-center gap-2 sm:gap-4">
+                        {/* with blue buttons */}
+                        {/* <nav className="flex items-center gap-2 sm:gap-4">
     <ThemeToggle />
 
     <Link
@@ -321,10 +321,10 @@ const Home = () => {
                                 Sign In
                             </Link> */}
 
-                            
-     <Link
-    to="/login"
-    className="
+
+                            <Link
+                                to="/login"
+                                className="
     px-8 py-4
     text-lg font-semibold
     text-slate-700
@@ -338,11 +338,11 @@ const Home = () => {
     hover:shadow-[0_8px_24px_rgba(37,99,235,0.18)]
     hover:-translate-y-1
     "
->
-    Sign In
-</Link>
-                            
-                            
+                            >
+                                Sign In
+                            </Link>
+
+
                         </div>
 
                         {/* Dashboard Preview */}
@@ -699,7 +699,7 @@ const Home = () => {
                                         </div>
                                         <div>
                                             <h4 className="font-bold text-slate-900 dark:text-white">Call Us</h4>
-                                            <p className="text-slate-600 dark:text-slate-400">+91 9564598789</p>
+                                            <p className="text-slate-600 dark:text-slate-400">+91 73500*****</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-4">
