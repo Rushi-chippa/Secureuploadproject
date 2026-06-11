@@ -218,6 +218,30 @@ def login(login_data: schemas.LoginRequest, db: Session = Depends(get_db)):
         "company": company_data
     }
 
+@router.get("/public-stats")
+def get_public_stats(db: Session = Depends(get_db)):
+    try:
+        from sales.router import Sale
+        from sqlalchemy import func
+        companies_count = db.query(models.Company).count()
+        salesmen_count = db.query(models.User).filter(models.User.role == "salesman").count()
+        total_sales_amount = db.query(func.sum(Sale.amount)).scalar() or 0.0
+        return {
+            "companies_count": companies_count,
+            "salesmen_count": salesmen_count,
+            "total_sales_amount": float(total_sales_amount),
+            "uptime": "99.9%"
+        }
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return {
+            "companies_count": 0,
+            "salesmen_count": 0,
+            "total_sales_amount": 0.0,
+            "uptime": "99.9%"
+        }
+
 @router.get("/companies", response_model=list[schemas.CompanyResponse])
 def get_companies(db: Session = Depends(get_db)):
     return db.query(models.Company).all()

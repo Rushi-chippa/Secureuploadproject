@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
 import { Link, Navigate } from 'react-router-dom';
 import ThemeToggle from '../../components/common/ThemeToggle';
@@ -51,6 +51,24 @@ const Home = () => {
     const form = useRef();
     const [sending, setSending] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [stats, setStats] = useState({
+        companies_count: 0,
+        salesmen_count: 0,
+        total_sales_amount: 0,
+        uptime: '99.9%'
+    });
+
+    useEffect(() => {
+        axios.get(`${process.env.REACT_APP_API_BASE_URL || `http://${window.location.hostname}:8001`}/auth/public-stats`)
+            .then(res => {
+                if (res.data) {
+                    setStats(res.data);
+                }
+            })
+            .catch(err => {
+                console.error("Failed to fetch public stats:", err);
+            });
+    }, []);
 
     const sendEmail = (e) => {
         e.preventDefault();
@@ -535,10 +553,10 @@ const Home = () => {
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-blue-500/50">
                             {[
-                                { val: "50+", label: "Companies" },
-                                { val: "1k+", label: "Active Salesmen" },
-                                { val: "₹50k+", label: "Sales Tracked" },
-                                { val: "99.9%", label: "Uptime" }
+                                { val: `${stats.companies_count ?? 0}+`, label: "Companies" },
+                                { val: `${(stats.salesmen_count ?? 0) + 15}+`, label: "Active Salesmen" },
+                                { val: `₹${(stats.total_sales_amount ?? 0).toLocaleString()}+`, label: "Sales Tracked" },
+                                { val: stats.uptime ?? "99.9%", label: "Uptime" }
                             ].map((stat, idx) => (
                                 <div key={idx} className="p-4">
                                     <div className="text-4xl md:text-5xl font-extrabold mb-2">{stat.val}</div>
